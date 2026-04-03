@@ -263,6 +263,7 @@ tr:hover td { background: var(--paper); }
     <div class="stat-card blue"><div class="stat-label">Total Budgeted</div><div class="stat-value blue mono" id="bud-total">S$0</div></div>
     <div class="stat-card red"><div class="stat-label">Actual Spent</div><div class="stat-value mono" id="bud-actual" style="color:var(--ink-3)">—</div></div>
     <div class="stat-card green"><div class="stat-label">Variance</div><div class="stat-value mono" id="bud-variance" style="color:var(--ink-3)">—</div></div>
+    <div class="stat-card gold"><div class="stat-label">Avg Monthly Spend <span id="avg-filter-label" style="font-weight:400;text-transform:none;letter-spacing:0">(6M)</span></div><div class="stat-value gold mono" id="bud-avg-spend">—</div><div class="stat-change" id="bud-avg-spend-aud"></div></div>
   </div>
 
   <div class="month-nav">
@@ -366,6 +367,9 @@ tr:hover td { background: var(--paper); }
       <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
           <span style="width:28px;height:2px;display:inline-block" id="trend-line-legend"></span> Trend
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
+          <span style="width:28px;height:2px;display:inline-block;border-top:2px dotted #2d7a4f" id="avg-line-legend"></span> Average
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
           <span style="width:28px;height:0;border-top:2px dashed #b03a2e;display:inline-block"></span> Budgeted
@@ -781,6 +785,10 @@ function setSummaryFilter(n, btn) {
   summaryFilter = n;
   document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
+  // Update average label
+  var label = n===1?'1M':n===12?'1Y':n>=24?(n/12)+'Y':n+'M';
+  var el = document.getElementById('avg-filter-label');
+  if (el) el.textContent = '(' + label + ')';
   renderSummary(); renderSpendingChart();
 }
 
@@ -788,6 +796,26 @@ function renderSummary() {
   var months = lastNMonths(summaryFilter);
   var tbl = document.getElementById('summary-table');
   var hasAny = months.some(function(m){ return state.budgetMonths[m] && (state.budgetMonths[m].items.length || state.budgetMonths[m].actual); });
+
+  // Compute average monthly spend for the period
+  var actualValues = months.map(function(m) {
+    var md = state.budgetMonths[m];
+    if (!md || !md.actual) return null;
+    var mfx = getMonthFX(m);
+    return md.actual.cur==='SGD' ? md.actual.amt : md.actual.amt/(mfx[md.actual.cur]||1);
+  }).filter(function(v){ return v !== null; });
+
+  var avgSGD = actualValues.length ? actualValues.reduce(function(s,v){return s+v;},0) / actualValues.length : null;
+  var avgCard = document.getElementById('bud-avg-spend');
+  var avgAudCard = document.getElementById('bud-avg-spend-aud');
+  if (avgSGD !== null && avgCard) {
+    avgCard.textContent = fmtSGD(avgSGD);
+    var audAvg = avgSGD * (fxRates.AUD || 1.12);
+    if (avgAudCard) avgAudCard.textContent = 'A$' + Math.round(audAvg).toLocaleString('en-US') + ' · ' + actualValues.length + ' months of data';
+  } else {
+    if (avgCard) avgCard.textContent = '—';
+    if (avgAudCard) avgAudCard.textContent = 'No actuals in this period';
+  }
 
   var hdrs = months.map(function(m){ return '<th>' + mShort(m) + '</th>'; }).join('');
   var html = '<thead><tr><th></th>' + hdrs + '</tr></thead><tbody>';
@@ -865,7 +893,10 @@ function setChartCur(cur) {
   });
   // Update legend line
   var leg = document.getElementById('trend-line-legend');
-  if (leg) leg.style.background = cur==='SGD'?'#2d7a4f':cur==='AUD'?'#b8860b':'#2563a8';
+  var avgLeg = document.getElementById('avg-line-legend');
+  var lineCol = cur==='SGD'?'#2d7a4f':cur==='AUD'?'#b8860b':'#2563a8';
+  if (leg) leg.style.background = lineCol;
+  if (avgLeg) avgLeg.style.borderTopColor = lineCol;
   renderSpendingChart();
 }
 
@@ -914,14 +945,20 @@ function renderSpendingChart() {
     trend = months.map(function(_,i){ return Math.round(intercept+slope*i); });
   }
 
+  // Average line
+  var validActuals = actuals.filter(function(v){ return v !== null; });
+  var avgVal = validActuals.length ? Math.round(validActuals.reduce(function(s,v){return s+v;},0) / validActuals.length) : null;
+  var avgLine = months.map(function(){ return avgVal; });
+
   charts.spending = new Chart(canvas, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [
-        { type:'bar',  label:'Actual',    data:actuals,  backgroundColor:barClr[cur].bg, borderColor:barClr[cur].bd, borderWidth:1.5, borderRadius:4, order:3 },
-        { type:'line', label:'Trend',     data:trend,    borderColor:tClr[cur], borderWidth:2.5, pointRadius:0, tension:0.4, fill:false, order:1 },
-        { type:'line', label:'Budgeted',  data:budgeted, borderColor:'#b03a2e', borderDash:[6,4], borderWidth:2, pointRadius:3, pointBackgroundColor:'#b03a2e', tension:0.3, fill:false, order:2 }
+        { type:'bar',  label:'Actual',    data:actuals,  backgroundColor:barClr[cur].bg, borderColor:barClr[cur].bd, borderWidth:1.5, borderRadius:4, order:4 },
+        { type:'line', label:'Trend',     data:trend,    borderColor:tClr[cur], borderWidth:2, pointRadius:0, tension:0.4, fill:false, order:2 },
+        { type:'line', label:'Average',   data:avgLine,  borderColor:tClr[cur], borderWidth:2, borderDash:[3,3], pointRadius:0, fill:false, order:3, opacity:0.6 },
+        { type:'line', label:'Budgeted',  data:budgeted, borderColor:'#b03a2e', borderDash:[6,4], borderWidth:2, pointRadius:3, pointBackgroundColor:'#b03a2e', tension:0.3, fill:false, order:1 }
       ]
     },
     options: {
