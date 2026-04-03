@@ -6,154 +6,158 @@
 <title>Ledger — Personal Finance</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --ink: #0f1117; --ink-2: #3a3f52; --ink-3: #8891a8;
-    --paper: #f8f7f4; --paper-2: #eeecea; --paper-3: #e4e2de;
-    --gold: #c8923a; --gold-light: #f5e6cf;
-    --green: #2d7a4f; --green-light: #d4eddf;
-    --red: #b03a2e; --red-light: #fce8e6;
-    --blue: #2563a8; --blue-light: #ddeaf7;
-    --shadow: 0 1px 3px rgba(15,17,23,0.08), 0 4px 16px rgba(15,17,23,0.06);
-    --radius: 12px; --radius-sm: 6px;
-  }
-  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #0f1117; --ink-2: #3a3f52; --ink-3: #8891a8;
+  --paper: #f8f7f4; --paper-2: #eeecea; --paper-3: #e4e2de;
+  --gold: #c8923a; --gold-light: #f5e6cf;
+  --green: #2d7a4f; --green-light: #d4eddf;
+  --red: #b03a2e; --red-light: #fce8e6;
+  --blue: #2563a8; --blue-light: #ddeaf7;
+  --shadow: 0 1px 3px rgba(15,17,23,0.08), 0 4px 16px rgba(15,17,23,0.06);
+  --radius: 12px; --radius-sm: 6px;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
 
-  header { background: var(--ink); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
-  .logo { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; letter-spacing: -0.02em; }
-  .logo span { color: var(--gold); }
-  nav { display: flex; gap: 4px; }
-  .nav-btn { background: none; border: none; color: var(--ink-3); padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
-  .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
-  .nav-btn.active { color: #fff; background: rgba(200,146,58,0.2); border: 1px solid rgba(200,146,58,0.4); }
-  .header-date { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--ink-3); letter-spacing: 0.05em; }
+/* HEADER */
+header { background: var(--ink); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+.logo { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: #fff; letter-spacing: -0.02em; }
+.logo span { color: var(--gold); }
+nav { display: flex; gap: 4px; }
+.nav-btn { background: none; border: none; color: var(--ink-3); padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+.nav-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.nav-btn.active { color: #fff; background: rgba(200,146,58,0.2); border: 1px solid rgba(200,146,58,0.4); }
+.header-date { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--ink-3); letter-spacing: 0.05em; }
 
-  main { flex: 1; padding: 2rem; max-width: 1300px; margin: 0 auto; width: 100%; }
-  .page { display: none; }
-  .page.active { display: block; }
+/* LAYOUT */
+main { flex: 1; padding: 2rem; max-width: 1300px; margin: 0 auto; width: 100%; }
+.page { display: none; }
+.page.active { display: block; }
+.section-title { font-family: 'DM Serif Display', serif; font-size: 1.75rem; color: var(--ink); margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+.section-sub { font-size: 0.875rem; color: var(--ink-3); margin-bottom: 2rem; font-weight: 300; }
 
-  .section-title { font-family: 'DM Serif Display', serif; font-size: 1.75rem; color: var(--ink); margin-bottom: 0.25rem; letter-spacing: -0.02em; }
-  .section-sub { font-size: 0.875rem; color: var(--ink-3); margin-bottom: 2rem; font-weight: 300; }
+/* CARDS */
+.card { background: #fff; border-radius: var(--radius); border: 1px solid var(--paper-3); box-shadow: var(--shadow); padding: 1.5rem; margin-bottom: 1.5rem; }
+.card-title { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 1rem; }
 
-  .card { background: #fff; border-radius: var(--radius); border: 1px solid var(--paper-3); box-shadow: var(--shadow); padding: 1.5rem; margin-bottom: 1.5rem; }
-  .card-title { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 1rem; }
+/* STAT GRID */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--paper-3); padding: 1.25rem 1.5rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+.stat-card.gold::before { background: var(--gold); } .stat-card.green::before { background: var(--green); }
+.stat-card.red::before { background: var(--red); } .stat-card.blue::before { background: var(--blue); }
+.stat-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.5rem; }
+.stat-value { font-family: 'DM Mono', monospace; font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; }
+.stat-value.gold { color: var(--gold); } .stat-value.green { color: var(--green); } .stat-value.red { color: var(--red); } .stat-value.blue { color: var(--blue); }
+.stat-change { font-size: 0.75rem; color: var(--ink-3); margin-top: 0.25rem; }
 
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-  .stat-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--paper-3); padding: 1.25rem 1.5rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
-  .stat-card.gold::before { background: var(--gold); }
-  .stat-card.green::before { background: var(--green); }
-  .stat-card.red::before { background: var(--red); }
-  .stat-card.blue::before { background: var(--blue); }
-  .stat-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.5rem; }
-  .stat-value { font-family: 'DM Mono', monospace; font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; }
-  .stat-value.gold { color: var(--gold); } .stat-value.green { color: var(--green); }
-  .stat-value.red { color: var(--red); } .stat-value.blue { color: var(--blue); }
-  .stat-change { font-size: 0.75rem; color: var(--ink-3); margin-top: 0.25rem; }
+/* FORMS */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; align-items: end; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+label { font-size: 0.75rem; font-weight: 600; color: var(--ink-2); letter-spacing: 0.04em; }
+input, select { border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--ink); background: var(--paper); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); background: #fff; }
+.btn { background: var(--ink); color: #fff; border: none; border-radius: var(--radius-sm); padding: 9px 20px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btn:hover { background: var(--gold); }
+.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+.btn-ghost { background: none; color: var(--red); border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 5px 10px; font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-ghost:hover { background: var(--red-light); border-color: var(--red); }
 
-  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; align-items: end; }
-  .form-group { display: flex; flex-direction: column; gap: 4px; }
-  label { font-size: 0.75rem; font-weight: 600; color: var(--ink-2); letter-spacing: 0.04em; }
-  input, select { border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--ink); background: var(--paper); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
-  input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-light); background: #fff; }
-  .btn { background: var(--ink); color: #fff; border: none; border-radius: var(--radius-sm); padding: 9px 20px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-  .btn:hover { background: var(--gold); }
-  .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
-  .btn-ghost { background: none; color: var(--red); border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 5px 10px; font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-  .btn-ghost:hover { background: var(--red-light); border-color: var(--red); }
+/* TABLES */
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 8px 12px; text-align: left; border-bottom: 2px solid var(--paper-3); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--paper-2); font-size: 0.875rem; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--paper); }
+.mono { font-family: 'DM Mono', monospace; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; }
+.tag-green { background: var(--green-light); color: var(--green); }
+.tag-red { background: var(--red-light); color: var(--red); }
+.tag-blue { background: var(--blue-light); color: var(--blue); }
 
-  table { width: 100%; border-collapse: collapse; }
-  th { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); padding: 8px 12px; text-align: left; border-bottom: 2px solid var(--paper-3); }
-  td { padding: 10px 12px; border-bottom: 1px solid var(--paper-2); font-size: 0.875rem; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--paper); }
-  .mono { font-family: 'DM Mono', monospace; }
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; }
-  .tag-green { background: var(--green-light); color: var(--green); }
-  .tag-red { background: var(--red-light); color: var(--red); }
-  .tag-blue { background: var(--blue-light); color: var(--blue); }
-  .tag-gold { background: var(--gold-light); color: var(--gold); }
+/* PROGRESS */
+.progress-bar { height: 8px; background: var(--paper-2); border-radius: 100px; overflow: hidden; margin-top: 4px; }
+.progress-fill { height: 100%; border-radius: 100px; transition: width 0.6s ease; }
+.progress-fill.green { background: var(--green); } .progress-fill.blue { background: var(--blue); }
+.progress-fill.gold { background: var(--gold); } .progress-fill.red { background: var(--red); }
 
-  .progress-bar { height: 8px; background: var(--paper-2); border-radius: 100px; overflow: hidden; margin-top: 4px; }
-  .progress-fill { height: 100%; border-radius: 100px; transition: width 0.6s ease; }
-  .progress-fill.green { background: var(--green); } .progress-fill.gold { background: var(--gold); }
-  .progress-fill.red { background: var(--red); } .progress-fill.blue { background: var(--blue); }
+/* MISC */
+.chart-area { height: 200px; position: relative; margin-top: 1rem; }
+.empty { text-align: center; padding: 2.5rem 1rem; color: var(--ink-3); font-size: 0.9rem; }
+.empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.5; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.al-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media(max-width:700px) { .two-col, .al-grid { grid-template-columns: 1fr; } }
+.al-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--paper-2); font-size: 0.875rem; }
+.al-item:last-child { border-bottom: none; }
+.al-total { display: flex; justify-content: space-between; padding-top: 10px; font-weight: 700; font-size: 0.9rem; border-top: 2px solid var(--ink); margin-top: 4px; }
+.text-right { text-align: right; }
+.text-green { color: var(--green); } .text-red { color: var(--red); } .text-gold { color: var(--gold); }
 
-  .chart-area { height: 200px; position: relative; margin-top: 1rem; }
-  .empty { text-align: center; padding: 2.5rem 1rem; color: var(--ink-3); font-size: 0.9rem; }
-  .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.5; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  @media(max-width:700px) { .two-col { grid-template-columns: 1fr; } }
-  .al-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  @media(max-width:640px) { .al-grid { grid-template-columns: 1fr; } }
-  .al-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--paper-2); font-size: 0.875rem; }
-  .al-item:last-child { border-bottom: none; }
-  .al-total { display: flex; justify-content: space-between; padding-top: 10px; font-weight: 700; font-size: 0.9rem; border-top: 2px solid var(--ink); margin-top: 4px; }
-  .text-right { text-align: right; }
-  .text-green { color: var(--green); } .text-red { color: var(--red); }
-  .text-gold { color: var(--gold); } .text-blue { color: var(--blue); }
+/* FX BAR */
+.fx-bar { display: flex; align-items: center; gap: 1rem; background: var(--paper); border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 8px 16px; margin-bottom: 1.5rem; font-size: 0.78rem; color: var(--ink-3); flex-wrap: wrap; }
+.fx-rate { font-family: 'DM Mono', monospace; color: var(--ink-2); font-weight: 500; }
+.fx-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 4px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* FX Bar */
-  .fx-bar { display: flex; align-items: center; gap: 1rem; background: var(--paper); border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 8px 16px; margin-bottom: 1.5rem; font-size: 0.78rem; color: var(--ink-3); flex-wrap: wrap; }
-  .fx-rate { font-family: 'DM Mono', monospace; color: var(--ink-2); font-weight: 500; }
-  .fx-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; display: inline-block; margin-right: 4px; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* MONTH NAV */
+.month-nav { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.month-nav button { background: none; border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 6px 16px; cursor: pointer; font-size: 1rem; color: var(--ink-2); transition: all 0.15s; }
+.month-nav button:hover { border-color: var(--gold); color: var(--gold); }
+.month-label { font-family: 'DM Serif Display', serif; font-size: 1.25rem; min-width: 170px; text-align: center; }
 
-  /* Month nav */
-  .month-nav { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-  .month-nav button { background: none; border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 6px 16px; cursor: pointer; font-size: 1rem; color: var(--ink-2); transition: all 0.15s; }
-  .month-nav button:hover { border-color: var(--gold); color: var(--gold); }
-  .month-label { font-family: 'DM Serif Display', serif; font-size: 1.25rem; min-width: 170px; text-align: center; }
+/* BUDGET ITEM GRID: name | cat | original | S$ | A$ | THB | del */
+.bud-col-header { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 0 0 8px 0; border-bottom: 2px solid var(--paper-3); margin-bottom: 2px; }
+.bud-col-header span { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+.bud-item-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--paper-2); }
+.bud-item-row:last-child { border-bottom: none; }
+.bud-total-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 12px 0 0 0; border-top: 2px solid var(--ink); margin-top: 8px; }
+.col-sgd { color: var(--green); font-weight: 600; }
+.col-aud { color: #b8860b; font-weight: 600; }
+.col-thb { color: var(--blue); font-weight: 600; }
 
-  /* Budget items — 7 cols: name, cat, original, SGD, AUD, THB, delete */
-  .bud-col-header { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 0 0 8px 0; border-bottom: 2px solid var(--paper-3); margin-bottom: 2px; }
-  .bud-col-header span { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
-  .bud-item-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--paper-2); }
-  .bud-item-row:last-child { border-bottom: none; }
-  .bud-total-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 12px 0 0 0; border-top: 2px solid var(--ink); margin-top: 8px; }
-  .col-sgd { color: var(--green); font-weight: 600; }
-  .col-aud { color: #b8860b; font-weight: 600; }
-  .col-thb { color: var(--blue); font-weight: 600; }
+/* ACTUAL BLOCK */
+.actual-block { background: var(--paper); border-radius: var(--radius-sm); padding: 1.25rem 1.5rem; margin-top: 1.25rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; border: 1px solid var(--paper-3); }
+.variance-chip { padding: 4px 14px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 0.82rem; font-weight: 600; }
+.variance-chip.under { background: var(--green-light); color: var(--green); }
+.variance-chip.over { background: var(--red-light); color: var(--red); }
 
-  /* Actual block */
-  .actual-block { background: var(--paper); border-radius: var(--radius-sm); padding: 1.25rem 1.5rem; margin-top: 1.25rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; border: 1px solid var(--paper-3); }
-  .variance-chip { padding: 4px 14px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 0.82rem; font-weight: 600; }
-  .variance-chip.under { background: var(--green-light); color: var(--green); }
-  .variance-chip.over { background: var(--red-light); color: var(--red); }
+/* FX OVERRIDE */
+.fx-override { background: var(--paper); border: 1px solid var(--paper-3); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-top: 1.25rem; }
+.fx-override-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: .75rem; margin-top: .75rem; }
 
-  /* Summary table */
-  .summary-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-  .filter-btn { background: none; border: 1px solid var(--paper-3); border-radius: 100px; padding: 5px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink-3); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
-  .filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-  .summary-wrap { overflow-x: auto; }
-  .summary-tbl { border-collapse: collapse; min-width: 500px; width: 100%; }
-  .summary-tbl th { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); padding: 8px 14px; text-align: right; border-bottom: 2px solid var(--paper-3); white-space: nowrap; }
-  .summary-tbl th:first-child { text-align: left; }
-  .summary-tbl td { padding: 9px 14px; border-bottom: 1px solid var(--paper-2); font-size: 0.82rem; text-align: right; font-family: 'DM Mono', monospace; white-space: nowrap; }
-  .summary-tbl td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--ink-2); }
-  .summary-tbl tr:hover td { background: var(--paper); }
-  .summary-tbl tr.row-total td { font-weight: 700; border-top: 2px solid var(--paper-3); border-bottom: 2px solid var(--paper-3); background: var(--paper); }
-  .summary-tbl tr.row-total td:first-child { color: var(--ink); }
-  .summary-tbl tr.row-actual td { color: var(--red); font-weight: 600; }
-  .summary-tbl tr.row-actual td:first-child { color: var(--red); }
-  .summary-tbl tr.row-variance td { font-weight: 700; }
-  .summary-tbl tr.row-variance-pct td { font-weight: 700; border-bottom: 2px solid var(--paper-3); }
-  .summary-tbl tr.row-variance-pct td:first-child { color: var(--ink-2); font-family: 'DM Sans', sans-serif; }
-  .summary-tbl td.pos { color: var(--green); }
-  .summary-tbl td.neg { color: var(--red); }
-  .summary-tbl td.dim { color: var(--ink-3); opacity: 0.45; font-weight: 300; }
+/* SUMMARY TABLE */
+.summary-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.filter-btn { background: none; border: 1px solid var(--paper-3); border-radius: 100px; padding: 5px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink-3); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+.filter-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.summary-wrap { overflow-x: auto; }
+.summary-tbl { border-collapse: collapse; min-width: 500px; width: 100%; }
+.summary-tbl th { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); padding: 8px 14px; text-align: right; border-bottom: 2px solid var(--paper-3); white-space: nowrap; }
+.summary-tbl th:first-child { text-align: left; }
+.summary-tbl td { padding: 9px 14px; border-bottom: 1px solid var(--paper-2); font-size: 0.82rem; text-align: right; font-family: 'DM Mono', monospace; white-space: nowrap; }
+.summary-tbl td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--ink-2); }
+.summary-tbl tr:hover td { background: var(--paper); }
+.summary-tbl tr.row-total td { font-weight: 700; border-top: 2px solid var(--paper-3); border-bottom: 2px solid var(--paper-3); background: var(--paper); }
+.summary-tbl tr.row-total td:first-child { color: var(--ink); }
+.summary-tbl tr.row-actual td { color: var(--red); font-weight: 600; }
+.summary-tbl tr.row-actual td:first-child { color: var(--red); }
+.summary-tbl tr.row-var-dollar td { font-weight: 700; }
+.summary-tbl tr.row-var-pct td { font-weight: 700; border-bottom: 2px solid var(--paper-3); }
+.summary-tbl td.pos { color: var(--green); }
+.summary-tbl td.neg { color: var(--red); }
+.summary-tbl td.dim { color: var(--ink-3); opacity: 0.4; font-weight: 300; }
 
-  /* Goals */
-  .goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
-  .goal-card { background: #fff; border: 1px solid var(--paper-3); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); }
-  .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
-  .goal-name { font-weight: 600; font-size: 0.95rem; }
-  .goal-pct { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--ink-3); }
-  .goal-amounts { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ink-3); margin-top: 6px; font-family: 'DM Mono', monospace; }
+/* GOALS */
+.goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 1rem; }
+.goal-card { background: #fff; border: 1px solid var(--paper-3); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); }
+.goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+.goal-name { font-weight: 600; font-size: 0.95rem; }
+.goal-pct { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--ink-3); }
+.goal-amounts { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--ink-3); margin-top: 6px; font-family: 'DM Mono', monospace; }
 
-  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-  .page.active .card, .page.active .stat-card { animation: fadeUp 0.3s ease both; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+.page.active .card, .page.active .stat-card { animation: fadeUp 0.3s ease both; }
 </style>
 </head>
 <body>
@@ -198,9 +202,9 @@
   <div class="section-title">Net Worth</div>
   <div class="section-sub">All values converted to SGD at live rates.</div>
   <div class="stat-grid">
-    <div class="stat-card gold"><div class="stat-label">Total Assets</div><div class="stat-value gold mono" id="nw-assets">SGD 0</div></div>
-    <div class="stat-card red"><div class="stat-label">Total Liabilities</div><div class="stat-value red mono" id="nw-liabilities">SGD 0</div></div>
-    <div class="stat-card green"><div class="stat-label">Net Worth (SGD)</div><div class="stat-value green mono" id="nw-total">SGD 0</div></div>
+    <div class="stat-card gold"><div class="stat-label">Total Assets</div><div class="stat-value gold mono" id="nw-assets">S$0</div></div>
+    <div class="stat-card red"><div class="stat-label">Total Liabilities</div><div class="stat-value red mono" id="nw-liabilities">S$0</div></div>
+    <div class="stat-card green"><div class="stat-label">Net Worth (SGD)</div><div class="stat-value green mono" id="nw-total">S$0</div></div>
   </div>
   <div class="al-grid">
     <div class="card">
@@ -217,7 +221,7 @@
         <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addAsset()">+ Add</button></div>
       </div>
       <div id="asset-list"></div>
-      <div class="al-total"><span>Total Assets (SGD)</span><span class="mono text-gold" id="asset-total">SGD 0</span></div>
+      <div class="al-total"><span>Total Assets (SGD)</span><span class="mono col-sgd" id="asset-total">S$0</span></div>
     </div>
     <div class="card">
       <div class="card-title">Liabilities</div>
@@ -233,7 +237,7 @@
         <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addLiability()">+ Add</button></div>
       </div>
       <div id="liab-list"></div>
-      <div class="al-total"><span>Total Liabilities (SGD)</span><span class="mono text-red" id="liab-total">SGD 0</span></div>
+      <div class="al-total"><span>Total Liabilities (SGD)</span><span class="mono text-red" id="liab-total">S$0</span></div>
     </div>
   </div>
   <div class="card">
@@ -249,12 +253,12 @@
 <!-- BUDGET -->
 <div class="page" id="page-budget">
   <div class="section-title">Budget</div>
-  <div class="section-sub">Monthly itemised forecast · auto-copies to new months · lump-sum actual entry.</div>
+  <div class="section-sub">Monthly itemised forecast with live currency conversion.</div>
 
-  <div class="fx-bar" id="fx-bar"><span style="color:var(--ink-3);font-style:italic">⟳ Loading live exchange rates...</span></div>
+  <div class="fx-bar" id="fx-bar"><span style="color:var(--ink-3);font-style:italic">Loading live rates...</span></div>
 
   <div class="stat-grid">
-    <div class="stat-card blue"><div class="stat-label">Total Budgeted</div><div class="stat-value blue mono" id="bud-total">SGD 0</div></div>
+    <div class="stat-card blue"><div class="stat-label">Total Budgeted</div><div class="stat-value blue mono" id="bud-total">S$0</div></div>
     <div class="stat-card red"><div class="stat-label">Actual Spent</div><div class="stat-value mono" id="bud-actual" style="color:var(--ink-3)">—</div></div>
     <div class="stat-card green"><div class="stat-label">Variance</div><div class="stat-value mono" id="bud-variance" style="color:var(--ink-3)">—</div></div>
   </div>
@@ -266,61 +270,59 @@
   </div>
 
   <div class="card">
-    <div id="add-item-form">
-      <div class="card-title">Add Budget Item</div>
-      <div class="form-grid" style="margin-bottom:1.25rem">
-        <div class="form-group"><label>Item Name</label><input id="new-item-name" placeholder="e.g. Rent"></div>
-        <div class="form-group"><label>Category</label><input id="new-item-cat" placeholder="e.g. Housing"></div>
-        <div class="form-group"><label>Currency</label>
-          <select id="new-item-cur"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
-        </div>
-        <div class="form-group"><label>Amount</label><input id="new-item-amt" type="number" placeholder="0"></div>
-        <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addBudgetItem()">+ Add Item</button></div>
+    <div class="card-title">Add Budget Item</div>
+    <div class="form-grid" style="margin-bottom:1.25rem">
+      <div class="form-group"><label>Item Name</label><input id="new-item-name" placeholder="e.g. Rent"></div>
+      <div class="form-group"><label>Category</label><input id="new-item-cat" placeholder="e.g. Housing"></div>
+      <div class="form-group"><label>Currency</label>
+        <select id="new-item-cur"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
       </div>
+      <div class="form-group"><label>Amount</label><input id="new-item-amt" type="number" placeholder="0"></div>
+      <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addBudgetItem()">+ Add Item</button></div>
     </div>
 
-    <div class="card-title" style="margin-top:.5rem">Budget Items</div>
+    <div class="card-title">Budget Items</div>
     <div class="bud-col-header">
       <span>Item</span><span>Category</span><span>Original</span>
-      <span style="color:var(--green)">SGD Equiv.</span>
-      <span style="color:#b8860b">AUD Equiv.</span>
+      <span style="color:var(--green)">S$ Equiv.</span>
+      <span style="color:#b8860b">A$ Equiv.</span>
       <span style="color:var(--blue)">THB Equiv.</span>
       <span></span>
     </div>
     <div id="budget-items-list"></div>
     <div class="bud-total-row" id="bud-total-row" style="display:none">
-      <span style="font-weight:700">Total Budgeted</span><span></span><span></span>
-      <span class="mono col-sgd" id="bud-items-total">SGD 0</span>
-      <span class="mono col-aud" id="bud-items-total-aud">AUD 0</span>
-      <span class="mono col-thb" id="bud-items-total-thb">THB 0</span>
+      <span style="font-weight:700">Total</span><span></span><span></span>
+      <span class="mono col-sgd" id="bud-items-sgd">S$0</span>
+      <span class="mono col-aud" id="bud-items-aud">A$0</span>
+      <span class="mono col-thb" id="bud-items-thb">฿0</span>
       <span></span>
     </div>
 
-    <!-- Historical FX Override -->
-    <div id="fx-override-block" style="margin-top:1.25rem;padding:1rem 1.25rem;background:var(--paper);border:1px solid var(--paper-3);border-radius:var(--radius-sm)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+    <!-- FX Override -->
+    <div class="fx-override">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
         <div>
           <div style="font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">FX Rates for this Month</div>
-          <div style="font-size:.78rem;color:var(--ink-3);margin-top:2px" id="fx-override-status"></div>
+          <div style="font-size:.78rem;color:var(--ink-3);margin-top:2px" id="fx-status">Using live rates — enter values below to lock historical rates</div>
         </div>
         <div style="display:flex;gap:.5rem">
           <button class="btn btn-sm" onclick="saveFXOverride()">Lock Rates</button>
-          <button class="btn-ghost btn-sm" id="fx-clear-btn" onclick="clearFXOverride()" style="display:none">Clear Override</button>
+          <button class="btn-ghost btn-sm" id="fx-clear-btn" onclick="clearFXOverride()" style="display:none">Clear</button>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem" id="fx-override-inputs">
-        <div class="form-group"><label>AUD → SGD (1 AUD =)</label><input id="fx-aud" type="number" step="0.0001" placeholder="e.g. 0.89"></div>
-        <div class="form-group"><label>THB → SGD (1 THB =)</label><input id="fx-thb" type="number" step="0.0001" placeholder="e.g. 0.037"></div>
-        <div class="form-group"><label>GBP → SGD (1 GBP =)</label><input id="fx-gbp" type="number" step="0.0001" placeholder="e.g. 1.71"></div>
-        <div class="form-group"><label>USD → SGD (1 USD =)</label><input id="fx-usd" type="number" step="0.0001" placeholder="e.g. 1.35"></div>
+      <div class="fx-override-grid">
+        <div class="form-group"><label>1 AUD = ? SGD</label><input id="fx-aud" type="number" step="0.0001" placeholder="e.g. 0.8900"></div>
+        <div class="form-group"><label>1 THB = ? SGD</label><input id="fx-thb" type="number" step="0.0001" placeholder="e.g. 0.0364"></div>
+        <div class="form-group"><label>1 GBP = ? SGD</label><input id="fx-gbp" type="number" step="0.0001" placeholder="e.g. 1.7100"></div>
+        <div class="form-group"><label>1 USD = ? SGD</label><input id="fx-usd" type="number" step="0.0001" placeholder="e.g. 1.3500"></div>
       </div>
     </div>
 
-    <!-- Actual expenditure input -->
+    <!-- Actual expenditure -->
     <div class="actual-block">
       <div>
         <div style="font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px">Actual Spent This Month</div>
-        <div style="font-size:.8rem;color:var(--ink-3)">Enter your total expenditure after month ends</div>
+        <div style="font-size:.8rem;color:var(--ink-3)">Enter total after month ends</div>
       </div>
       <div id="actual-input-wrap" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
         <select id="actual-cur" style="width:80px"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
@@ -359,14 +361,18 @@
   <div style="font-family:'DM Serif Display',serif;font-size:1.15rem;letter-spacing:-0.01em;margin-bottom:.75rem">Spending Trend</div>
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem">
-      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
-        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:2px;background:var(--green);display:inline-block"></span> Trend</div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:0;border-top:2px dashed var(--red);display:inline-block"></span> Budgeted</div>
+      <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
+          <span style="width:28px;height:2px;display:inline-block" id="trend-line-legend"></span> Trend
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
+          <span style="width:28px;height:0;border-top:2px dashed #b03a2e;display:inline-block"></span> Budgeted
+        </div>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="chart-toggle active" id="toggle-sgd" onclick="setChartCurrency('SGD')" style="background:rgba(45,122,79,0.85);color:#fff;border:none;border-radius:100px;padding:5px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">SGD</button>
-        <button class="chart-toggle" id="toggle-aud" onclick="setChartCurrency('AUD')" style="background:none;color:#b8860b;border:2px solid #b8860b;border-radius:100px;padding:5px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">AUD</button>
-        <button class="chart-toggle" id="toggle-thb" onclick="setChartCurrency('THB')" style="background:none;color:var(--blue);border:2px solid var(--blue);border-radius:100px;padding:5px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">THB</button>
+        <button id="toggle-sgd" onclick="setChartCur('SGD')" style="background:rgba(45,122,79,0.85);color:#fff;border:none;border-radius:100px;padding:5px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">S$</button>
+        <button id="toggle-aud" onclick="setChartCur('AUD')" style="background:none;color:#b8860b;border:2px solid #b8860b;border-radius:100px;padding:5px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">A$</button>
+        <button id="toggle-thb" onclick="setChartCur('THB')" style="background:none;color:var(--blue);border:2px solid var(--blue);border-radius:100px;padding:5px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">฿</button>
       </div>
     </div>
     <div style="height:260px;position:relative"><canvas id="spendingChart"></canvas></div>
@@ -376,7 +382,7 @@
 <!-- TRANSACTIONS -->
 <div class="page" id="page-transactions">
   <div class="section-title">Transactions</div>
-  <div class="section-sub">Log income and expenses — all amounts shown in original currency and SGD equivalent.</div>
+  <div class="section-sub">Log income and expenses — shown in original currency and SGD.</div>
   <div class="card">
     <div class="card-title">New Transaction</div>
     <div class="form-grid">
@@ -397,8 +403,8 @@
     <div class="card-title">Transaction History</div>
     <div style="overflow-x:auto">
       <table>
-        <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Currency</th><th class="text-right">Amount</th><th class="text-right">SGD</th><th></th></tr></thead>
-        <tbody id="tx-table-body"></tbody>
+        <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Ccy</th><th class="text-right">Amount</th><th class="text-right">SGD</th><th></th></tr></thead>
+        <tbody id="tx-body"></tbody>
       </table>
       <div class="empty" id="tx-empty" style="display:none"><div class="empty-icon">📋</div>No transactions yet.</div>
     </div>
@@ -431,333 +437,340 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-// ── STATE ──────────────────────────────────────────────────────────────────────
-let state = {
+// STATE
+var state = {
   assets: [], liabilities: [], transactions: [], goals: [], nwHistory: [],
-  budgetMonths: {}, // { "YYYY-MM": { items:[{id,name,cat,cur,amt}], actual:{cur,amt}|null } }
-  currentBudgetMonth: new Date().toISOString().slice(0,7),
+  budgetMonths: {},
+  currentBudgetMonth: new Date().toISOString().slice(0,7)
 };
-let fxRates = { SGD:1, AUD:1, THB:1, GBP:1, USD:1 };
-let summaryFilter = 6;
+var fxRates = { SGD:1, AUD:1, THB:1, GBP:1, USD:1 };
+var summaryFilter = 6;
+var chartCur = 'SGD';
+var charts = {};
 
-function load() { const s = localStorage.getItem('ledger_v2'); if(s) try { state = JSON.parse(s); } catch(e){} }
-function save() { localStorage.setItem('ledger_v2', JSON.stringify(state)); }
+function loadState() { try { var s = localStorage.getItem('ledger_v2'); if(s) state = JSON.parse(s); } catch(e){} }
+function saveState() { localStorage.setItem('ledger_v2', JSON.stringify(state)); }
 
-// ── FX ─────────────────────────────────────────────────────────────────────────
-async function loadFX() {
-  try {
-    const r = await fetch('https://api.exchangerate-api.com/v4/latest/SGD');
-    const d = await r.json();
-    fxRates = {...d.rates, SGD:1};
-    renderFXBar(true);
-  } catch(e) {
-    // Approximate fallback rates (units of currency per 1 SGD)
-    fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:0.585, USD:0.74 };
-    document.getElementById('fx-bar').innerHTML = '<span style="color:var(--gold)">⚠ Using approximate rates — live rates unavailable</span>';
-    return;
-  }
-  renderAll();
-}
-
-function renderFXBar(live=false) {
-  const pairs = ['AUD','THB','GBP','USD'];
-  const rates = pairs.map(c => `<span>1 SGD = <span class="fx-rate">${(fxRates[c]||1).toFixed(c==='THB'?2:4)} ${c}</span></span>`).join('<span style="color:var(--paper-3);padding:0 4px">|</span>');
-  document.getElementById('fx-bar').innerHTML = `<span class="fx-dot"></span><strong style="color:var(--ink-2);font-size:.8rem">Live Rates</strong>${rates}`;
-}
+// CURRENCY UTILS
+var SYM = { SGD:'S$', AUD:'A$', THB:'฿', GBP:'£', USD:'US$' };
+function sym(c) { return SYM[c] || c+' '; }
+function fmtSGD(n) { return 'S$' + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+function fmtCur(n, c) { return sym(c||'SGD') + Math.round(Math.abs(n)).toLocaleString('en-US'); }
+function fmtCurDec(n, c) { return sym(c||'SGD') + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 
 function toSGD(amt, cur) {
   if (!cur || cur === 'SGD') return amt;
   return amt / (fxRates[cur] || 1);
 }
 
-// ── UTILS ──────────────────────────────────────────────────────────────────────
-const curSym = c => ({ SGD:'S$', AUD:'A$', THB:'฿', GBP:'£', USD:'US$' }[c] || c+' ');
-const S  = n => 'S$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-const C  = (n,c) => curSym(c||'SGD') + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-const CD = (n,c) => curSym(c||'SGD') + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-function mLabel(ym) { const [y,m]=ym.split('-'); return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'}); }
-function mShort(ym) { const [y,m]=ym.split('-'); return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'short',year:'2-digit'}); }
-function isPast(ym) { return ym < new Date().toISOString().slice(0,7); }
-function prevMonth(ym) {
-  let [y,m] = ym.split('-').map(Number);
-  m--; if(m<1){m=12;y--;}
-  return y+'-'+(m<10?'0'+m:m);
-}
-function nextMonth(ym) {
-  let [y,m] = ym.split('-').map(Number);
-  m++; if(m>12){m=1;y++;}
-  return y+'-'+(m<10?'0'+m:m);
-}
-function getMD(m) { if(!state.budgetMonths[m]) state.budgetMonths[m]={items:[],actual:null,fx:null}; return state.budgetMonths[m]; }
-
-// Returns FX rates for a given month — uses locked rates if set, else live rates
 function getMonthFX(m) {
-  const md = state.budgetMonths[m];
-  if (md?.fx) return md.fx;
+  var md = state.budgetMonths[m];
+  if (md && md.fx) return md.fx;
   return fxRates;
 }
 
-function toSGDForMonth(amt, cur, m) {
+function toSGDm(amt, cur, m) {
   if (!cur || cur === 'SGD') return amt;
-  const rates = getMonthFX(m);
+  var rates = getMonthFX(m);
   return amt / (rates[cur] || 1);
 }
 
-// ── NAV ────────────────────────────────────────────────────────────────────────
+// MONTH UTILS
+function prevMonth(ym) {
+  var y = parseInt(ym.slice(0,4)), m = parseInt(ym.slice(5,7));
+  m--; if(m < 1) { m = 12; y--; }
+  return y + '-' + (m < 10 ? '0'+m : ''+m);
+}
+function nextMonth(ym) {
+  var y = parseInt(ym.slice(0,4)), m = parseInt(ym.slice(5,7));
+  m++; if(m > 12) { m = 1; y++; }
+  return y + '-' + (m < 10 ? '0'+m : ''+m);
+}
+function mLabel(ym) { var p=ym.split('-'); return new Date(+p[0],+p[1]-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'}); }
+function mShort(ym) { var p=ym.split('-'); return new Date(+p[0],+p[1]-1,1).toLocaleDateString('en-US',{month:'short',year:'2-digit'}); }
+
+function getMD(m) {
+  if (!state.budgetMonths[m]) state.budgetMonths[m] = { items:[], actual:null, fx:null };
+  return state.budgetMonths[m];
+}
+
+function lastNMonths(n) {
+  var months = [], now = new Date();
+  for (var i = n-1; i >= 0; i--) {
+    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    months.push(d.toISOString().slice(0,7));
+  }
+  return months;
+}
+
+// FX
+async function loadFX() {
+  try {
+    var r = await fetch('https://api.exchangerate-api.com/v4/latest/SGD');
+    var d = await r.json();
+    fxRates = d.rates; fxRates.SGD = 1;
+    renderFXBar(true);
+    renderAll();
+  } catch(e) {
+    fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:1.71, USD:1.35 };
+    document.getElementById('fx-bar').innerHTML = '<span style="color:var(--gold)">Using approximate rates — live rates unavailable</span>';
+    renderAll();
+  }
+}
+
+function renderFXBar() {
+  var pairs = ['AUD','THB','GBP','USD'];
+  var html = '<span class="fx-dot"></span><strong style="color:var(--ink-2);font-size:.8rem">Live Rates</strong>';
+  for (var i=0; i<pairs.length; i++) {
+    var c = pairs[i], rate = fxRates[c] ? (1/fxRates[c]) : 0;
+    html += '<span>1 SGD = <span class="fx-rate">' + rate.toFixed(c==='THB'?2:4) + ' ' + c + '</span></span>';
+    if (i < pairs.length-1) html += '<span style="color:var(--paper-3);padding:0 4px">|</span>';
+  }
+  document.getElementById('fx-bar').innerHTML = html;
+}
+
+// NAVIGATION
 function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('page-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
   renderAll();
 }
 
-// ── BUDGET ─────────────────────────────────────────────────────────────────────
+// BUDGET
 function changeMonth(dir) {
-  state.currentBudgetMonth = dir>0 ? nextMonth(state.currentBudgetMonth) : prevMonth(state.currentBudgetMonth);
-  const m = state.currentBudgetMonth;
-  const prev = prevMonth(m);
-  // Auto-copy from previous month if this month is empty
-  if ((!state.budgetMonths[m] || !state.budgetMonths[m].items.length) && state.budgetMonths[prev]?.items?.length) {
-    state.budgetMonths[m] = { items: state.budgetMonths[prev].items.map(i=>({...i,id:Date.now()+Math.random()})), actual: null };
-    save();
+  state.currentBudgetMonth = dir > 0 ? nextMonth(state.currentBudgetMonth) : prevMonth(state.currentBudgetMonth);
+  var m = state.currentBudgetMonth;
+  var prev = prevMonth(m);
+  if ((!state.budgetMonths[m] || !state.budgetMonths[m].items.length) &&
+      state.budgetMonths[prev] && state.budgetMonths[prev].items.length) {
+    state.budgetMonths[m] = {
+      items: state.budgetMonths[prev].items.map(function(i){ return {id:Date.now()+Math.random(),name:i.name,cat:i.cat,cur:i.cur,amt:i.amt}; }),
+      actual: null, fx: null
+    };
+    saveState();
   }
   renderBudget(); renderSummary(); renderSpendingChart();
 }
 
-function saveFXOverride() {
-  const m = state.currentBudgetMonth;
-  const md = getMD(m);
-  const aud = parseFloat(document.getElementById('fx-aud').value);
-  const thb = parseFloat(document.getElementById('fx-thb').value);
-  const gbp = parseFloat(document.getElementById('fx-gbp').value);
-  const usd = parseFloat(document.getElementById('fx-usd').value);
-  // Store as "units per 1 SGD" to match fxRates format (1/rate)
-  md.fx = {
-    SGD: 1,
-    AUD: aud ? 1/aud : fxRates['AUD'],
-    THB: thb ? 1/thb : fxRates['THB'],
-    GBP: gbp ? 1/gbp : fxRates['GBP'],
-    USD: usd ? 1/usd : fxRates['USD'],
-  };
-  save(); renderBudget(); renderSummary(); renderSpendingChart();
-}
-
-function clearFXOverride() {
-  const m = state.currentBudgetMonth;
-  getMD(m).fx = null;
-  save(); renderBudget(); renderSummary(); renderSpendingChart();
-}
-
-function renderFXOverride() {
-  const m = state.currentBudgetMonth;
-  const md = getMD(m);
-  const clearBtn = document.getElementById('fx-clear-btn');
-  const status = document.getElementById('fx-override-status');
-
-  if (md.fx) {
-    // Show locked rates
-    const toRate = (key) => md.fx[key] ? (1/md.fx[key]).toFixed(4) : '—';
-    document.getElementById('fx-aud').value = toRate('AUD');
-    document.getElementById('fx-thb').value = toRate('THB');
-    document.getElementById('fx-gbp').value = toRate('GBP');
-    document.getElementById('fx-usd').value = toRate('USD');
-    clearBtn.style.display = 'inline-block';
-    status.textContent = '🔒 Using locked historical rates for this month';
-    status.style.color = 'var(--gold)';
-  } else {
-    // Show live rates as placeholder
-    document.getElementById('fx-aud').value = '';
-    document.getElementById('fx-thb').value = '';
-    document.getElementById('fx-gbp').value = '';
-    document.getElementById('fx-usd').value = '';
-    document.getElementById('fx-aud').placeholder = fxRates['AUD'] ? (1/fxRates['AUD']).toFixed(4) : '—';
-    document.getElementById('fx-thb').placeholder = fxRates['THB'] ? (1/fxRates['THB']).toFixed(4) : '—';
-    document.getElementById('fx-gbp').placeholder = fxRates['GBP'] ? (1/fxRates['GBP']).toFixed(4) : '—';
-    document.getElementById('fx-usd').placeholder = fxRates['USD'] ? (1/fxRates['USD']).toFixed(4) : '—';
-    clearBtn.style.display = 'none';
-    status.textContent = 'Using live rates — enter values above to lock historical rates';
-    status.style.color = 'var(--ink-3)';
-  }
-}
-
-
-  const m = state.currentBudgetMonth;
-  const name = document.getElementById('new-item-name').value.trim();
-  const cat  = document.getElementById('new-item-cat').value.trim();
-  const cur  = document.getElementById('new-item-cur').value;
-  const amt  = parseFloat(document.getElementById('new-item-amt').value)||0;
-  if (!name||!amt) return;
-  getMD(m).items.push({id:Date.now(),name,cat,cur,amt});
-  document.getElementById('new-item-name').value='';
-  document.getElementById('new-item-cat').value='';
-  document.getElementById('new-item-amt').value='';
-  save(); renderBudget(); renderSummary(); renderSpendingChart();
+function addBudgetItem() {
+  var m = state.currentBudgetMonth;
+  var name = document.getElementById('new-item-name').value.trim();
+  var cat  = document.getElementById('new-item-cat').value.trim();
+  var cur  = document.getElementById('new-item-cur').value;
+  var amt  = parseFloat(document.getElementById('new-item-amt').value) || 0;
+  if (!name || !amt) return;
+  getMD(m).items.push({ id:Date.now(), name:name, cat:cat, cur:cur, amt:amt });
+  document.getElementById('new-item-name').value = '';
+  document.getElementById('new-item-cat').value = '';
+  document.getElementById('new-item-amt').value = '';
+  saveState(); renderBudget(); renderSummary(); renderSpendingChart();
 }
 
 function removeBudgetItem(id) {
-  const m = state.currentBudgetMonth;
-  getMD(m).items = getMD(m).items.filter(i=>i.id!==id);
-  save(); renderBudget(); renderSummary(); renderSpendingChart();
+  var m = state.currentBudgetMonth;
+  getMD(m).items = getMD(m).items.filter(function(i){ return i.id !== id; });
+  saveState(); renderBudget(); renderSummary(); renderSpendingChart();
 }
 
 function saveActual() {
-  const m = state.currentBudgetMonth;
-  const cur = document.getElementById('actual-cur').value;
-  const amt = parseFloat(document.getElementById('actual-amt').value)||0;
-  if(!amt) return;
-  getMD(m).actual = {cur, amt};
-  save(); renderBudget(); renderSummary(); renderSpendingChart();
+  var m = state.currentBudgetMonth;
+  var cur = document.getElementById('actual-cur').value;
+  var amt = parseFloat(document.getElementById('actual-amt').value) || 0;
+  if (!amt) return;
+  getMD(m).actual = { cur:cur, amt:amt };
+  saveState(); renderBudget(); renderSummary(); renderSpendingChart();
 }
 
 function editActual() {
-  const m = state.currentBudgetMonth;
+  var m = state.currentBudgetMonth;
   getMD(m).actual = null;
-  document.getElementById('actual-amt').value='';
-  save(); renderBudget(); renderSpendingChart();
+  document.getElementById('actual-amt').value = '';
+  saveState(); renderBudget(); renderSpendingChart();
+}
+
+function saveFXOverride() {
+  var m = state.currentBudgetMonth;
+  var md = getMD(m);
+  var aud = parseFloat(document.getElementById('fx-aud').value);
+  var thb = parseFloat(document.getElementById('fx-thb').value);
+  var gbp = parseFloat(document.getElementById('fx-gbp').value);
+  var usd = parseFloat(document.getElementById('fx-usd').value);
+  md.fx = {
+    SGD: 1,
+    AUD: aud ? 1/aud : fxRates.AUD,
+    THB: thb ? 1/thb : fxRates.THB,
+    GBP: gbp ? 1/gbp : fxRates.GBP,
+    USD: usd ? 1/usd : fxRates.USD
+  };
+  saveState(); renderBudget(); renderSummary(); renderSpendingChart();
+}
+
+function clearFXOverride() {
+  var m = state.currentBudgetMonth;
+  getMD(m).fx = null;
+  saveState(); renderBudget(); renderSummary(); renderSpendingChart();
 }
 
 function renderBudget() {
-  const m = state.currentBudgetMonth;
-  const md = getMD(m);
-  const mfx = getMonthFX(m);
-  const toS = (amt, cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
-  const totalSGD = md.items.reduce((s,i)=>s+toS(i.amt,i.cur),0);
-  const totalAUD = totalSGD * (mfx['AUD']||1.12);
-  const totalTHB = totalSGD * (mfx['THB']||27.5);
+  var m = state.currentBudgetMonth;
+  var md = getMD(m);
+  var mfx = getMonthFX(m);
+
+  function cvt(amt, cur) {
+    if (!cur || cur === 'SGD') return amt;
+    return amt / (mfx[cur] || 1);
+  }
+
+  var totalSGD = md.items.reduce(function(s,i){ return s + cvt(i.amt,i.cur); }, 0);
+  var totalAUD = totalSGD * (mfx.AUD || 1);
+  var totalTHB = totalSGD * (mfx.THB || 1);
 
   document.getElementById('budget-month-label').textContent = mLabel(m);
-  document.getElementById('add-item-form').style.display = 'block';
-  document.getElementById('bud-total').textContent = S(totalSGD);
-  document.getElementById('bud-items-total').textContent = S(totalSGD);
-  document.getElementById('bud-items-total-aud').textContent = 'A$'+Math.round(totalAUD).toLocaleString();
-  document.getElementById('bud-items-total-thb').textContent = '฿'+Math.round(totalTHB).toLocaleString();
+  document.getElementById('bud-total').textContent = fmtSGD(totalSGD);
+  document.getElementById('bud-items-sgd').textContent = fmtSGD(totalSGD);
+  document.getElementById('bud-items-aud').textContent = 'A$' + Math.round(totalAUD).toLocaleString('en-US');
+  document.getElementById('bud-items-thb').textContent = '฿' + Math.round(totalTHB).toLocaleString('en-US');
   document.getElementById('bud-total-row').style.display = md.items.length ? 'grid' : 'none';
 
   // Actual
   if (md.actual) {
-    const aSGD = toSGD(md.actual.amt, md.actual.cur);
-    const v = totalSGD - aSGD;
-    document.getElementById('bud-actual').textContent = S(aSGD);
+    var aSGD = cvt(md.actual.amt, md.actual.cur);
+    var v = totalSGD - aSGD;
+    document.getElementById('bud-actual').textContent = fmtSGD(aSGD);
     document.getElementById('bud-actual').style.color = 'var(--red)';
-    document.getElementById('bud-variance').textContent = (v>=0?'Under ':'Over ')+S(Math.abs(v));
+    document.getElementById('bud-variance').textContent = (v>=0?'Under ':'Over ') + fmtSGD(Math.abs(v));
     document.getElementById('bud-variance').style.color = v>=0?'var(--green)':'var(--red)';
-    document.getElementById('actual-input-wrap').style.display='none';
-    document.getElementById('actual-saved-wrap').style.display='flex';
-    document.getElementById('actual-saved-val').textContent = C(md.actual.amt,md.actual.cur)+' ≈ '+S(aSGD);
-    const chip = document.getElementById('variance-chip');
-    chip.textContent = (v>=0?'▼ Under ':'▲ Over ')+S(Math.abs(v));
-    chip.className = 'variance-chip '+(v>=0?'under':'over');
+    document.getElementById('actual-input-wrap').style.display = 'none';
+    document.getElementById('actual-saved-wrap').style.display = 'flex';
+    document.getElementById('actual-saved-val').textContent = fmtCur(md.actual.amt,md.actual.cur) + ' = ' + fmtSGD(aSGD);
+    var chip = document.getElementById('variance-chip');
+    chip.textContent = (v>=0?'Under ':'Over ') + fmtSGD(Math.abs(v));
+    chip.className = 'variance-chip ' + (v>=0?'under':'over');
   } else {
-    document.getElementById('bud-actual').textContent='—';
-    document.getElementById('bud-actual').style.color='var(--ink-3)';
-    document.getElementById('bud-variance').textContent='—';
-    document.getElementById('bud-variance').style.color='var(--ink-3)';
-    document.getElementById('actual-input-wrap').style.display='flex';
-    document.getElementById('actual-saved-wrap').style.display='none';
+    document.getElementById('bud-actual').textContent = '—';
+    document.getElementById('bud-actual').style.color = 'var(--ink-3)';
+    document.getElementById('bud-variance').textContent = '—';
+    document.getElementById('bud-variance').style.color = 'var(--ink-3)';
+    document.getElementById('actual-input-wrap').style.display = 'flex';
+    document.getElementById('actual-saved-wrap').style.display = 'none';
   }
 
   // Items list
-  const list = document.getElementById('budget-items-list');
+  var list = document.getElementById('budget-items-list');
   if (!md.items.length) {
-    list.innerHTML='<div class="empty" style="padding:1.5rem"><div class="empty-icon">📋</div>No items yet. Add your first budget item above.</div>';
-    renderFXOverride();
-    return;
+    list.innerHTML = '<div class="empty" style="padding:1.5rem"><div class="empty-icon">📋</div>No items yet. Add your first budget item above.</div>';
+  } else {
+    list.innerHTML = md.items.map(function(item) {
+      var sgd = cvt(item.amt, item.cur);
+      var aud = sgd * (mfx.AUD || 1);
+      var thb = sgd * (mfx.THB || 1);
+      return '<div class="bud-item-row">' +
+        '<span style="font-weight:500">' + item.name + '</span>' +
+        '<span style="font-size:.8rem;color:var(--ink-3)">' + (item.cat||'—') + '</span>' +
+        '<span class="mono" style="font-size:.82rem;color:var(--ink-3)">' + fmtCur(item.amt,item.cur) + '</span>' +
+        '<span class="mono col-sgd">' + fmtSGD(sgd) + '</span>' +
+        '<span class="mono col-aud">A$' + Math.round(aud).toLocaleString('en-US') + '</span>' +
+        '<span class="mono col-thb">฿' + Math.round(thb).toLocaleString('en-US') + '</span>' +
+        '<button class="btn-ghost" style="padding:3px 8px;font-size:.75rem" onclick="removeBudgetItem(' + item.id + ')">✕</button>' +
+        '</div>';
+    }).join('');
   }
-  list.innerHTML = md.items.map(item=>{
-    const sgd = toS(item.amt, item.cur);
-    const aud = sgd * (mfx['AUD']||1.12);
-    const thb = sgd * (mfx['THB']||27.5);
-    return `
-    <div class="bud-item-row">
-      <span style="font-weight:500">${item.name}</span>
-      <span style="font-size:.8rem;color:var(--ink-3)">${item.cat||'—'}</span>
-      <span class="mono" style="font-size:.82rem;color:var(--ink-3)">${C(item.amt,item.cur)}</span>
-      <span class="mono col-sgd">${S(sgd)}</span>
-      <span class="mono col-aud">A$${Math.round(aud).toLocaleString()}</span>
-      <span class="mono col-thb">฿${Math.round(thb).toLocaleString()}</span>
-      <button class="btn-ghost" style="padding:3px 8px;font-size:.75rem" onclick="removeBudgetItem(${item.id})">✕</button>
-    </div>`;
-  }).join('');
-  renderFXOverride();
+
+  // FX override UI
+  var clearBtn = document.getElementById('fx-clear-btn');
+  var status = document.getElementById('fx-status');
+  if (md.fx) {
+    document.getElementById('fx-aud').value = md.fx.AUD ? (1/md.fx.AUD).toFixed(4) : '';
+    document.getElementById('fx-thb').value = md.fx.THB ? (1/md.fx.THB).toFixed(4) : '';
+    document.getElementById('fx-gbp').value = md.fx.GBP ? (1/md.fx.GBP).toFixed(4) : '';
+    document.getElementById('fx-usd').value = md.fx.USD ? (1/md.fx.USD).toFixed(4) : '';
+    clearBtn.style.display = 'inline-block';
+    status.textContent = '🔒 Using locked historical rates for this month';
+    status.style.color = 'var(--gold)';
+  } else {
+    document.getElementById('fx-aud').value = '';
+    document.getElementById('fx-thb').value = '';
+    document.getElementById('fx-gbp').value = '';
+    document.getElementById('fx-usd').value = '';
+    document.getElementById('fx-aud').placeholder = fxRates.AUD ? (1/fxRates.AUD).toFixed(4) : '—';
+    document.getElementById('fx-thb').placeholder = fxRates.THB ? (1/fxRates.THB).toFixed(4) : '—';
+    document.getElementById('fx-gbp').placeholder = fxRates.GBP ? (1/fxRates.GBP).toFixed(4) : '—';
+    document.getElementById('fx-usd').placeholder = fxRates.USD ? (1/fxRates.USD).toFixed(4) : '—';
+    clearBtn.style.display = 'none';
+    status.textContent = 'Using live rates — enter values below to lock historical rates';
+    status.style.color = 'var(--ink-3)';
+  }
 }
 
-// ── SUMMARY ────────────────────────────────────────────────────────────────────
+// SUMMARY
 function setSummaryFilter(n, btn) {
-  summaryFilter=n;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  summaryFilter = n;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   renderSummary(); renderSpendingChart();
 }
 
-function lastNMonths(n) {
-  const months=[], now=new Date();
-  for(let i=n-1;i>=0;i--) { const d=new Date(now.getFullYear(),now.getMonth()-i,1); months.push(d.toISOString().slice(0,7)); }
-  return months;
-}
-
 function renderSummary() {
-  const months = lastNMonths(summaryFilter);
-  const tbl = document.getElementById('summary-table');
-  const hasAny = months.some(m => state.budgetMonths[m]?.items?.length || state.budgetMonths[m]?.actual);
+  var months = lastNMonths(summaryFilter);
+  var tbl = document.getElementById('summary-table');
+  var hasAny = months.some(function(m){ return state.budgetMonths[m] && (state.budgetMonths[m].items.length || state.budgetMonths[m].actual); });
 
-  let html = `<thead><tr><th></th>${months.map(m=>`<th>${mShort(m)}</th>`).join('')}</tr></thead><tbody>`;
+  var hdrs = months.map(function(m){ return '<th>' + mShort(m) + '</th>'; }).join('');
+  var html = '<thead><tr><th></th>' + hdrs + '</tr></thead><tbody>';
 
   if (!hasAny) {
-    html += `<tr><td colspan="${months.length+1}" style="text-align:center;color:var(--ink-3);padding:2rem;font-family:'DM Sans',sans-serif">No budget data yet for this period.</td></tr>`;
+    html += '<tr><td colspan="' + (months.length+1) + '" style="text-align:center;color:var(--ink-3);padding:2rem;font-family:\'DM Sans\',sans-serif">No budget data yet for this period.</td></tr>';
   } else {
-
     // Total Budgeted
-    html += `<tr class="row-total"><td>Total Budgeted</td>`;
-    months.forEach(m => {
-      const md = state.budgetMonths[m];
-      const mfx = getMonthFX(m);
-      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
-      const t = md?.items?.length ? md.items.reduce((s,i)=>s+toS(i.amt,i.cur),0) : 0;
-      html += `<td>${t>0 ? S(t) : '<span class="dim">—</span>'}</td>`;
+    html += '<tr class="row-total"><td>Total Budgeted</td>';
+    months.forEach(function(m) {
+      var md = state.budgetMonths[m];
+      var mfx = getMonthFX(m);
+      var t = md && md.items.length ? md.items.reduce(function(s,i){ return s + (i.cur==='SGD'?i.amt:i.amt/(mfx[i.cur]||1)); }, 0) : 0;
+      html += t > 0 ? '<td>' + fmtSGD(t) + '</td>' : '<td class="dim">—</td>';
     });
     html += '</tr>';
 
     // Actual Spent
-    html += `<tr class="row-actual"><td>Actual Spent</td>`;
-    months.forEach(m => {
-      const md = state.budgetMonths[m];
-      const mfx = getMonthFX(m);
-      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
-      const a = md?.actual ? toS(md.actual.amt, md.actual.cur) : null;
-      html += `<td>${a !== null ? S(a) : '<span class="dim">—</span>'}</td>`;
+    html += '<tr class="row-actual"><td>Actual Spent</td>';
+    months.forEach(function(m) {
+      var md = state.budgetMonths[m];
+      var mfx = getMonthFX(m);
+      var a = md && md.actual ? (md.actual.cur==='SGD'?md.actual.amt:md.actual.amt/(mfx[md.actual.cur]||1)) : null;
+      html += a !== null ? '<td>' + fmtSGD(a) + '</td>' : '<td class="dim">—</td>';
     });
     html += '</tr>';
 
     // Variance $
-    html += `<tr class="row-variance"><td>Variance $</td>`;
-    months.forEach(m => {
-      const md = state.budgetMonths[m];
-      if (!md?.actual) { html += `<td class="dim">—</td>`; return; }
-      const mfx = getMonthFX(m);
-      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
-      const budg = md.items?.reduce((s,i)=>s+toS(i.amt,i.cur),0)||0;
-      const act  = toS(md.actual.amt, md.actual.cur);
-      const v = budg - act;
-      html += `<td class="${v>=0?'pos':'neg'}">${v>=0?'+':'-'}${S(Math.abs(v))}</td>`;
+    html += '<tr class="row-var-dollar"><td>Variance S$</td>';
+    months.forEach(function(m) {
+      var md = state.budgetMonths[m];
+      if (!md || !md.actual) { html += '<td class="dim">—</td>'; return; }
+      var mfx = getMonthFX(m);
+      var cvt = function(amt,cur){ return cur==='SGD'?amt:amt/(mfx[cur]||1); };
+      var budg = md.items.reduce(function(s,i){ return s+cvt(i.amt,i.cur); }, 0);
+      var act  = cvt(md.actual.amt, md.actual.cur);
+      var v = budg - act;
+      html += '<td class="' + (v>=0?'pos':'neg') + '">' + (v>=0?'+':'-') + fmtSGD(Math.abs(v)) + '</td>';
     });
     html += '</tr>';
 
     // Variance %
-    html += `<tr class="row-variance-pct"><td>Variance %</td>`;
-    months.forEach(m => {
-      const md = state.budgetMonths[m];
-      if (!md?.actual) { html += `<td class="dim">—</td>`; return; }
-      const mfx = getMonthFX(m);
-      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
-      const budg = md.items?.reduce((s,i)=>s+toS(i.amt,i.cur),0)||0;
-      const act  = toS(md.actual.amt, md.actual.cur);
-      if (budg === 0) { html += `<td class="dim">—</td>`; return; }
-      const pct = ((budg - act) / budg) * 100;
-      const pos = pct >= 0;
-      const arrow = pos ? `<span style="color:var(--green)">▼</span>` : `<span style="color:var(--red)">▲</span>`;
-      html += `<td class="${pos?'pos':'neg'}" style="font-weight:700;white-space:nowrap">${arrow} ${Math.abs(pct).toFixed(1)}%</td>`;
+    html += '<tr class="row-var-pct"><td>Variance %</td>';
+    months.forEach(function(m) {
+      var md = state.budgetMonths[m];
+      if (!md || !md.actual) { html += '<td class="dim">—</td>'; return; }
+      var mfx = getMonthFX(m);
+      var cvt = function(amt,cur){ return cur==='SGD'?amt:amt/(mfx[cur]||1); };
+      var budg = md.items.reduce(function(s,i){ return s+cvt(i.amt,i.cur); }, 0);
+      var act  = cvt(md.actual.amt, md.actual.cur);
+      if (budg === 0) { html += '<td class="dim">—</td>'; return; }
+      var pct = ((budg - act) / budg) * 100;
+      var pos = pct >= 0;
+      var arrow = pos ? '<span style="color:var(--green)">▼</span>' : '<span style="color:var(--red)">▲</span>';
+      html += '<td class="' + (pos?'pos':'neg') + '" style="font-weight:700;white-space:nowrap">' + arrow + ' ' + Math.abs(pct).toFixed(1) + '%</td>';
     });
     html += '</tr>';
   }
@@ -766,264 +779,283 @@ function renderSummary() {
   tbl.innerHTML = html;
 }
 
-// ── NET WORTH ──────────────────────────────────────────────────────────────────
-function addAsset() {
-  const name=document.getElementById('asset-name').value.trim(), cat=document.getElementById('asset-cat').value;
-  const cur=document.getElementById('asset-cur').value, val=parseFloat(document.getElementById('asset-val').value)||0;
-  if(!name||!val) return;
-  state.assets.push({id:Date.now(),name,cat,cur,val});
-  document.getElementById('asset-name').value=''; document.getElementById('asset-val').value='';
-  save(); renderNetWorth(); renderDashboard();
-}
-function removeAsset(id) { state.assets=state.assets.filter(a=>a.id!==id); save(); renderNetWorth(); renderDashboard(); }
-
-function addLiability() {
-  const name=document.getElementById('liab-name').value.trim(), cat=document.getElementById('liab-cat').value;
-  const cur=document.getElementById('liab-cur').value, val=parseFloat(document.getElementById('liab-val').value)||0;
-  if(!name||!val) return;
-  state.liabilities.push({id:Date.now(),name,cat,cur,val});
-  document.getElementById('liab-name').value=''; document.getElementById('liab-val').value='';
-  save(); renderNetWorth(); renderDashboard();
-}
-function removeLiability(id) { state.liabilities=state.liabilities.filter(a=>a.id!==id); save(); renderNetWorth(); renderDashboard(); }
-
-function saveNWSnapshot() {
-  const m=document.getElementById('nw-hist-month').value||new Date().toISOString().slice(0,7);
-  const ta=state.assets.reduce((s,a)=>s+toSGD(a.val,a.cur),0);
-  const tl=state.liabilities.reduce((s,a)=>s+toSGD(a.val,a.cur),0);
-  const nw=ta-tl;
-  const idx=state.nwHistory.findIndex(h=>h.month===m);
-  if(idx>=0) state.nwHistory[idx].nw=nw; else state.nwHistory.push({month:m,nw});
-  state.nwHistory.sort((a,b)=>a.month.localeCompare(b.month));
-  save(); renderNetWorth(); renderDashboard();
-}
-
-function renderNetWorth() {
-  const ta=state.assets.reduce((s,a)=>s+toSGD(a.val,a.cur),0);
-  const tl=state.liabilities.reduce((s,a)=>s+toSGD(a.val,a.cur),0);
-  document.getElementById('nw-assets').textContent=S(ta);
-  document.getElementById('nw-liabilities').textContent=S(tl);
-  document.getElementById('nw-total').textContent=S(ta-tl);
-  document.getElementById('asset-total').textContent=S(ta);
-  document.getElementById('liab-total').textContent=S(tl);
-
-  document.getElementById('asset-list').innerHTML = state.assets.length ? state.assets.map(a=>`
-    <div class="al-item">
-      <div><div style="font-weight:500;font-size:.875rem">${a.name}</div><div style="font-size:.7rem;color:var(--ink-3)">${a.cat}</div></div>
-      <div style="display:flex;align-items:center;gap:.75rem">
-        <span class="mono" style="font-size:.78rem;color:var(--ink-3)">${C(a.val,a.cur)}</span>
-        <span class="mono text-gold">${S(toSGD(a.val,a.cur))}</span>
-        <button class="btn-ghost" onclick="removeAsset(${a.id})">✕</button>
-      </div>
-    </div>`).join('') : '<div class="empty"><div class="empty-icon">🏦</div>Add your first asset.</div>';
-
-  document.getElementById('liab-list').innerHTML = state.liabilities.length ? state.liabilities.map(a=>`
-    <div class="al-item">
-      <div><div style="font-weight:500;font-size:.875rem">${a.name}</div><div style="font-size:.7rem;color:var(--ink-3)">${a.cat}</div></div>
-      <div style="display:flex;align-items:center;gap:.75rem">
-        <span class="mono" style="font-size:.78rem;color:var(--ink-3)">${C(a.val,a.cur)}</span>
-        <span class="mono text-red">${S(toSGD(a.val,a.cur))}</span>
-        <button class="btn-ghost" onclick="removeLiability(${a.id})">✕</button>
-      </div>
-    </div>`).join('') : '<div class="empty"><div class="empty-icon">💳</div>Add your first liability.</div>';
-
-  renderNWChart('nwChart2');
-}
-
-// ── TRANSACTIONS ───────────────────────────────────────────────────────────────
-function addTransaction() {
-  const date=document.getElementById('tx-date').value, desc=document.getElementById('tx-desc').value.trim();
-  const cat=document.getElementById('tx-cat').value.trim(), type=document.getElementById('tx-type').value;
-  const currency=document.getElementById('tx-currency').value, amount=parseFloat(document.getElementById('tx-amount').value)||0;
-  if(!date||!desc||!amount) return;
-  state.transactions.unshift({id:Date.now(),date,desc,category:cat,type,currency,amount});
-  document.getElementById('tx-desc').value=''; document.getElementById('tx-amount').value='';
-  save(); renderTransactions(); renderDashboard();
-}
-function removeTransaction(id) { state.transactions=state.transactions.filter(t=>t.id!==id); save(); renderTransactions(); renderDashboard(); }
-
-function renderTransactions() {
-  const tbody=document.getElementById('tx-table-body'), empty=document.getElementById('tx-empty');
-  if(!state.transactions.length){tbody.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  tbody.innerHTML=state.transactions.map(t=>`
-    <tr>
-      <td class="mono" style="font-size:.8rem;color:var(--ink-3)">${t.date}</td>
-      <td style="font-weight:500">${t.desc}</td>
-      <td><span class="tag tag-blue">${t.category||'—'}</span></td>
-      <td><span class="tag ${t.type==='income'?'tag-green':'tag-red'}">${t.type}</span></td>
-      <td class="mono" style="font-size:.8rem;color:var(--ink-3)">${t.currency||'SGD'}</td>
-      <td class="text-right mono ${t.type==='income'?'text-green':'text-red'}">${t.type==='income'?'+':'-'}${CD(t.amount,t.currency||'SGD')}</td>
-      <td class="text-right mono" style="color:var(--ink-3);font-size:.8rem">${S(toSGD(t.amount,t.currency||'SGD'))}</td>
-      <td><button class="btn-ghost" onclick="removeTransaction(${t.id})">✕</button></td>
-    </tr>`).join('');
-}
-
-// ── GOALS ──────────────────────────────────────────────────────────────────────
-function addGoal() {
-  const name=document.getElementById('goal-name').value.trim(), target=parseFloat(document.getElementById('goal-target').value)||0;
-  const current=parseFloat(document.getElementById('goal-current').value)||0, date=document.getElementById('goal-date').value;
-  const color=document.getElementById('goal-color').value;
-  if(!name||!target) return;
-  state.goals.push({id:Date.now(),name,target,current,date,color});
-  document.getElementById('goal-name').value=''; document.getElementById('goal-target').value='';
-  document.getElementById('goal-current').value=''; document.getElementById('goal-date').value='';
-  save(); renderGoals();
-}
-function updateGoal(id) {
-  const g=state.goals.find(g=>g.id===id); if(!g) return;
-  const v=parseFloat(prompt(`Update saved amount for "${g.name}" (SGD):`,g.current));
-  if(!isNaN(v)){g.current=Math.max(0,v);save();renderGoals();}
-}
-function removeGoal(id) { state.goals=state.goals.filter(g=>g.id!==id);save();renderGoals(); }
-
-function renderGoals() {
-  const grid=document.getElementById('goals-grid');
-  if(!state.goals.length){grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎯</div>No savings goals yet.</div>`;return;}
-  grid.innerHTML=state.goals.map(g=>{
-    const pct=Math.min(100,g.target>0?(g.current/g.target)*100:0);
-    const days=g.date?Math.max(0,Math.round((new Date(g.date)-new Date())/(86400000))):null;
-    return `<div class="goal-card" style="border-top:3px solid var(--${g.color})">
-      <div class="goal-header"><div class="goal-name">${g.name}</div><div class="goal-pct">${Math.round(pct)}%</div></div>
-      <div class="progress-bar"><div class="progress-fill ${g.color}" style="width:${pct}%"></div></div>
-      <div class="goal-amounts"><span>${S(g.current)} saved</span><span>${S(g.target)} goal</span></div>
-      ${g.date?`<div style="font-size:.72rem;color:var(--ink-3);margin-top:6px">📅 ${days} days remaining</div>`:''}
-      <div style="margin-top:.75rem;display:flex;gap:.5rem">
-        <button class="btn" style="flex:1;padding:6px;font-size:.8rem" onclick="updateGoal(${g.id})">Update Amount</button>
-        <button class="btn-ghost" onclick="removeGoal(${g.id})">✕</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── DASHBOARD ──────────────────────────────────────────────────────────────────
-function renderDashboard() {
-  const m=state.currentBudgetMonth;
-  const ta=state.assets.reduce((s,a)=>s+toSGD(a.val,a.cur||'SGD'),0);
-  const tl=state.liabilities.reduce((s,a)=>s+toSGD(a.val,a.cur||'SGD'),0);
-  const md=getMD(m);
-  const budg=md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0);
-  const actSGD=md.actual?toSGD(md.actual.amt,md.actual.cur):null;
-  const v=actSGD!==null?budg-actSGD:null;
-
-  document.getElementById('dash-month-label').textContent=mLabel(m);
-  document.getElementById('dash-stats').innerHTML=`
-    <div class="stat-card green"><div class="stat-label">Net Worth</div><div class="stat-value green mono">${S(ta-tl)}</div><div class="stat-change">Assets: ${S(ta)}</div></div>
-    <div class="stat-card blue"><div class="stat-label">Monthly Budget</div><div class="stat-value blue mono">${S(budg)}</div><div class="stat-change">${mLabel(m)}</div></div>
-    <div class="stat-card red"><div class="stat-label">Actual Spent</div><div class="stat-value mono" style="color:${actSGD!==null?'var(--red)':'var(--ink-3)'}">${actSGD!==null?S(actSGD):'—'}</div><div class="stat-change">${actSGD!==null?'Recorded':'Not entered yet'}</div></div>
-    <div class="stat-card gold"><div class="stat-label">Variance</div><div class="stat-value mono" style="color:${v!==null?(v>=0?'var(--green)':'var(--red)'):'var(--ink-3)'}">${v!==null?(v>=0?'Under ':'Over ')+S(Math.abs(v)):'—'}</div></div>`;
-
-  document.getElementById('dash-budget-overview').innerHTML = md.items.length ? md.items.slice(0,7).map(i=>`
-    <div style="display:flex;align-items:center;gap:.75rem;padding:7px 0;border-bottom:1px solid var(--paper-2)">
-      <div style="font-size:.875rem;font-weight:500;min-width:110px">${i.name}</div>
-      <div style="flex:1"><div class="progress-bar"><div class="progress-fill blue" style="width:${budg>0?(toSGD(i.amt,i.cur)/budg*100):0}%"></div></div></div>
-      <div class="mono" style="font-size:.78rem;min-width:90px;text-align:right">${S(toSGD(i.amt,i.cur))}</div>
-    </div>`).join('') : '<div class="empty"><div class="empty-icon">📊</div>No budget items this month.</div>';
-
-  document.getElementById('dash-recent-tx').innerHTML = state.transactions.slice(0,8).length ? state.transactions.slice(0,8).map(t=>`
-    <div class="al-item">
-      <div><div style="font-weight:500;font-size:.875rem">${t.desc}</div><div style="font-size:.7rem;color:var(--ink-3)">${t.date} · ${t.category||'—'}</div></div>
-      <span class="mono ${t.type==='income'?'text-green':'text-red'}" style="font-size:.85rem">${t.type==='income'?'+':'-'}${CD(t.amount,t.currency||'SGD')}</span>
-    </div>`).join('') : '<div class="empty"><div class="empty-icon">📋</div>No transactions yet.</div>';
-
-  renderNWChart('nwChart');
-}
-
-// ── SPENDING TREND CHART ───────────────────────────────────────────────────────
-let chartCurrency = 'SGD';
-
-function setChartCurrency(cur) {
-  chartCurrency = cur;
-  const colors  = { SGD:'var(--green)', AUD:'#b8860b', THB:'var(--blue)' };
-  const bgs     = { SGD:'rgba(45,122,79,0.85)', AUD:'rgba(184,134,11,0.85)', THB:'rgba(37,99,168,0.85)' };
-  ['SGD','AUD','THB'].forEach(c => {
-    const btn = document.getElementById('toggle-'+c.toLowerCase());
+// SPENDING CHART
+function setChartCur(cur) {
+  chartCur = cur;
+  var clrs  = { SGD:'rgba(45,122,79,0.85)', AUD:'rgba(184,134,11,0.85)', THB:'rgba(37,99,168,0.85)' };
+  var bords = { SGD:'rgba(45,122,79,0.4)', AUD:'rgba(184,134,11,0.4)', THB:'rgba(37,99,168,0.4)' };
+  ['SGD','AUD','THB'].forEach(function(c) {
+    var btn = document.getElementById('toggle-' + c.toLowerCase());
     if (!btn) return;
-    btn.style.background = c===cur ? bgs[c] : 'none';
-    btn.style.color      = c===cur ? '#fff'  : colors[c];
-    btn.style.border     = c===cur ? 'none'  : '2px solid '+colors[c];
+    btn.style.background = c===cur ? clrs[c] : 'none';
+    btn.style.color = c===cur ? '#fff' : (c==='SGD'?'var(--green)':c==='AUD'?'#b8860b':'var(--blue)');
+    btn.style.border = c===cur ? 'none' : '2px solid ' + (c==='SGD'?'var(--green)':c==='AUD'?'#b8860b':'var(--blue)');
   });
+  // Update legend line
+  var leg = document.getElementById('trend-line-legend');
+  if (leg) leg.style.background = cur==='SGD'?'#2d7a4f':cur==='AUD'?'#b8860b':'#2563a8';
   renderSpendingChart();
 }
 
 function renderSpendingChart() {
-  const canvas = document.getElementById('spendingChart');
+  var canvas = document.getElementById('spendingChart');
   if (!canvas) return;
-  if (charts['spending']) { charts['spending'].destroy(); }
+  if (charts.spending) { charts.spending.destroy(); }
 
-  const months = lastNMonths(summaryFilter);
-  const labels = months.map(m => mShort(m));
-  const cur = chartCurrency;
-  const fxMap      = { SGD:1, AUD:fxRates['AUD']||1.12, THB:fxRates['THB']||27.5 };
-  const barColors  = { SGD:{bg:'rgba(45,122,79,0.22)',border:'rgba(45,122,79,0.8)'}, AUD:{bg:'rgba(184,134,11,0.22)',border:'rgba(184,134,11,0.8)'}, THB:{bg:'rgba(37,99,168,0.22)',border:'rgba(37,99,168,0.8)'} };
-  const trendClr   = { SGD:'#2d7a4f', AUD:'#b8860b', THB:'#2563a8' };
-  const tickPfx    = { SGD:'S$', AUD:'A$', THB:'฿' };
+  var months = lastNMonths(summaryFilter);
+  var labels = months.map(mShort);
+  var fxMap  = { SGD:1, AUD:fxRates.AUD||1.12, THB:fxRates.THB||27.5 };
+  var barClr = { SGD:{bg:'rgba(45,122,79,0.22)',bd:'rgba(45,122,79,0.8)'}, AUD:{bg:'rgba(184,134,11,0.22)',bd:'rgba(184,134,11,0.8)'}, THB:{bg:'rgba(37,99,168,0.22)',bd:'rgba(37,99,168,0.8)'} };
+  var tClr   = { SGD:'#2d7a4f', AUD:'#b8860b', THB:'#2563a8' };
+  var tPfx   = { SGD:'S$', AUD:'A$', THB:'฿' };
+  var cur = chartCur;
 
-  const actuals  = months.map(m => { const md=state.budgetMonths[m]; return md?.actual ? toSGD(md.actual.amt,md.actual.cur)*fxMap[cur] : null; });
-  const budgeted = months.map(m => { const md=state.budgetMonths[m]; return md?.items.length ? md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0)*fxMap[cur] : null; });
+  var actuals = months.map(function(m) {
+    var md = state.budgetMonths[m];
+    if (!md || !md.actual) return null;
+    var mfx = getMonthFX(m);
+    var sgd = md.actual.cur==='SGD' ? md.actual.amt : md.actual.amt/(mfx[md.actual.cur]||1);
+    return sgd * (fxMap[cur]||1);
+  });
 
-  const valid = actuals.map((v,i)=>v!==null?{x:i,y:v}:null).filter(Boolean);
-  let trend = new Array(months.length).fill(null);
+  var budgeted = months.map(function(m) {
+    var md = state.budgetMonths[m];
+    if (!md || !md.items.length) return null;
+    var mfx = getMonthFX(m);
+    var sgd = md.items.reduce(function(s,i){ return s+(i.cur==='SGD'?i.amt:i.amt/(mfx[i.cur]||1)); }, 0);
+    return sgd * (fxMap[cur]||1);
+  });
+
+  // Trend line
+  var valid = [];
+  actuals.forEach(function(v,i){ if(v!==null) valid.push({x:i,y:v}); });
+  var trend = months.map(function(){ return null; });
   if (valid.length >= 2) {
-    const n=valid.length, sx=valid.reduce((s,p)=>s+p.x,0), sy=valid.reduce((s,p)=>s+p.y,0);
-    const sxy=valid.reduce((s,p)=>s+p.x*p.y,0), sxx=valid.reduce((s,p)=>s+p.x*p.x,0);
-    const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx), intercept=(sy-slope*sx)/n;
-    trend = months.map((_,i)=>Math.round(intercept+slope*i));
+    var n=valid.length, sx=0,sy=0,sxy=0,sxx=0;
+    valid.forEach(function(p){ sx+=p.x; sy+=p.y; sxy+=p.x*p.y; sxx+=p.x*p.x; });
+    var slope=(n*sxy-sx*sy)/(n*sxx-sx*sx), intercept=(sy-slope*sx)/n;
+    trend = months.map(function(_,i){ return Math.round(intercept+slope*i); });
   }
 
-  charts['spending'] = new Chart(canvas, {
-    type:'bar',
-    data:{ labels, datasets:[
-      { type:'bar',  label:`Actual (${cur})`,  data:actuals,  backgroundColor:barColors[cur].bg, borderColor:barColors[cur].border, borderWidth:1.5, borderRadius:4, order:3 },
-      { type:'line', label:'Trend',             data:trend,    borderColor:trendClr[cur], borderWidth:2.5, pointRadius:0, tension:0.4, fill:false, order:1 },
-      { type:'line', label:`Budgeted (${cur})`, data:budgeted, borderColor:'#b03a2e', borderDash:[6,4], borderWidth:2, pointRadius:3, pointBackgroundColor:'#b03a2e', tension:0.3, fill:false, order:2 },
-    ]},
-    options:{
+  charts.spending = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { type:'bar',  label:'Actual',    data:actuals,  backgroundColor:barClr[cur].bg, borderColor:barClr[cur].bd, borderWidth:1.5, borderRadius:4, order:3 },
+        { type:'line', label:'Trend',     data:trend,    borderColor:tClr[cur], borderWidth:2.5, pointRadius:0, tension:0.4, fill:false, order:1 },
+        { type:'line', label:'Budgeted',  data:budgeted, borderColor:'#b03a2e', borderDash:[6,4], borderWidth:2, pointRadius:3, pointBackgroundColor:'#b03a2e', tension:0.3, fill:false, order:2 }
+      ]
+    },
+    options: {
       responsive:true, maintainAspectRatio:false,
       interaction:{ mode:'index', intersect:false },
       plugins:{
         legend:{ display:false },
-        tooltip:{ callbacks:{ label: ctx => {
+        tooltip:{ callbacks:{ label:function(ctx){
           if(ctx.raw===null) return null;
-          return ctx.dataset.label+': '+tickPfx[cur]+Math.round(ctx.raw).toLocaleString();
+          return ctx.dataset.label+': '+tPfx[cur]+Math.round(ctx.raw).toLocaleString('en-US');
         }}}
       },
       scales:{
         x:{ grid:{display:false}, ticks:{font:{family:'DM Sans',size:11},color:'#8891a8'} },
-        y:{ grid:{color:'#eeecea'}, beginAtZero:true, ticks:{font:{family:'DM Mono',size:11},color:'#8891a8', callback:v=>tickPfx[cur]+Math.round(v/1000)+'k'} }
+        y:{ grid:{color:'#eeecea'}, beginAtZero:true, ticks:{font:{family:'DM Mono',size:11},color:'#8891a8',callback:function(v){ return tPfx[cur]+Math.round(v/1000)+'k'; }} }
       }
     }
   });
 }
 
-// ── RENDER ALL ─────────────────────────────────────────────────────────────────
-let charts={};
+// NET WORTH
+function addAsset() {
+  var name=document.getElementById('asset-name').value.trim(), cat=document.getElementById('asset-cat').value;
+  var cur=document.getElementById('asset-cur').value, val=parseFloat(document.getElementById('asset-val').value)||0;
+  if(!name||!val) return;
+  state.assets.push({id:Date.now(),name:name,cat:cat,cur:cur,val:val});
+  document.getElementById('asset-name').value=''; document.getElementById('asset-val').value='';
+  saveState(); renderNetWorth(); renderDashboard();
+}
+function removeAsset(id) { state.assets=state.assets.filter(function(a){return a.id!==id;}); saveState(); renderNetWorth(); renderDashboard(); }
+
+function addLiability() {
+  var name=document.getElementById('liab-name').value.trim(), cat=document.getElementById('liab-cat').value;
+  var cur=document.getElementById('liab-cur').value, val=parseFloat(document.getElementById('liab-val').value)||0;
+  if(!name||!val) return;
+  state.liabilities.push({id:Date.now(),name:name,cat:cat,cur:cur,val:val});
+  document.getElementById('liab-name').value=''; document.getElementById('liab-val').value='';
+  saveState(); renderNetWorth(); renderDashboard();
+}
+function removeLiability(id) { state.liabilities=state.liabilities.filter(function(a){return a.id!==id;}); saveState(); renderNetWorth(); renderDashboard(); }
+
+function saveNWSnapshot() {
+  var m=document.getElementById('nw-hist-month').value||new Date().toISOString().slice(0,7);
+  var ta=state.assets.reduce(function(s,a){return s+toSGD(a.val,a.cur);},0);
+  var tl=state.liabilities.reduce(function(s,a){return s+toSGD(a.val,a.cur);},0);
+  var nw=ta-tl;
+  var idx=state.nwHistory.findIndex(function(h){return h.month===m;});
+  if(idx>=0) state.nwHistory[idx].nw=nw; else state.nwHistory.push({month:m,nw:nw});
+  state.nwHistory.sort(function(a,b){return a.month.localeCompare(b.month);});
+  saveState(); renderNetWorth(); renderDashboard();
+}
+
+function renderNetWorth() {
+  var ta=state.assets.reduce(function(s,a){return s+toSGD(a.val,a.cur);},0);
+  var tl=state.liabilities.reduce(function(s,a){return s+toSGD(a.val,a.cur);},0);
+  document.getElementById('nw-assets').textContent=fmtSGD(ta);
+  document.getElementById('nw-liabilities').textContent=fmtSGD(tl);
+  document.getElementById('nw-total').textContent=fmtSGD(ta-tl);
+  document.getElementById('asset-total').textContent=fmtSGD(ta);
+  document.getElementById('liab-total').textContent=fmtSGD(tl);
+
+  document.getElementById('asset-list').innerHTML = state.assets.length ? state.assets.map(function(a){
+    return '<div class="al-item"><div><div style="font-weight:500;font-size:.875rem">'+a.name+'</div><div style="font-size:.7rem;color:var(--ink-3)">'+a.cat+'</div></div>'+
+      '<div style="display:flex;align-items:center;gap:.75rem">'+
+      '<span class="mono" style="font-size:.78rem;color:var(--ink-3)">'+fmtCur(a.val,a.cur)+'</span>'+
+      '<span class="mono col-sgd">'+fmtSGD(toSGD(a.val,a.cur))+'</span>'+
+      '<button class="btn-ghost" onclick="removeAsset('+a.id+')">✕</button></div></div>';
+  }).join('') : '<div class="empty"><div class="empty-icon">🏦</div>Add your first asset.</div>';
+
+  document.getElementById('liab-list').innerHTML = state.liabilities.length ? state.liabilities.map(function(a){
+    return '<div class="al-item"><div><div style="font-weight:500;font-size:.875rem">'+a.name+'</div><div style="font-size:.7rem;color:var(--ink-3)">'+a.cat+'</div></div>'+
+      '<div style="display:flex;align-items:center;gap:.75rem">'+
+      '<span class="mono" style="font-size:.78rem;color:var(--ink-3)">'+fmtCur(a.val,a.cur)+'</span>'+
+      '<span class="mono text-red">'+fmtSGD(toSGD(a.val,a.cur))+'</span>'+
+      '<button class="btn-ghost" onclick="removeLiability('+a.id+')">✕</button></div></div>';
+  }).join('') : '<div class="empty"><div class="empty-icon">💳</div>Add your first liability.</div>';
+
+  renderNWChart('nwChart2');
+}
+
+// TRANSACTIONS
+function addTransaction() {
+  var date=document.getElementById('tx-date').value, desc=document.getElementById('tx-desc').value.trim();
+  var cat=document.getElementById('tx-cat').value.trim(), type=document.getElementById('tx-type').value;
+  var currency=document.getElementById('tx-currency').value, amount=parseFloat(document.getElementById('tx-amount').value)||0;
+  if(!date||!desc||!amount) return;
+  state.transactions.unshift({id:Date.now(),date:date,desc:desc,category:cat,type:type,currency:currency,amount:amount});
+  document.getElementById('tx-desc').value=''; document.getElementById('tx-amount').value='';
+  saveState(); renderTransactions(); renderDashboard();
+}
+function removeTransaction(id) { state.transactions=state.transactions.filter(function(t){return t.id!==id;}); saveState(); renderTransactions(); renderDashboard(); }
+
+function renderTransactions() {
+  var tbody=document.getElementById('tx-body'), empty=document.getElementById('tx-empty');
+  if(!state.transactions.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=state.transactions.map(function(t){
+    var sgd=toSGD(t.amount,t.currency||'SGD');
+    return '<tr>'+
+      '<td class="mono" style="font-size:.8rem;color:var(--ink-3)">'+t.date+'</td>'+
+      '<td style="font-weight:500">'+t.desc+'</td>'+
+      '<td><span class="tag tag-blue">'+(t.category||'—')+'</span></td>'+
+      '<td><span class="tag '+(t.type==='income'?'tag-green':'tag-red')+'">'+t.type+'</span></td>'+
+      '<td class="mono" style="font-size:.8rem;color:var(--ink-3)">'+(t.currency||'SGD')+'</td>'+
+      '<td class="text-right mono '+(t.type==='income'?'text-green':'text-red')+'">'+(t.type==='income'?'+':'-')+fmtCurDec(t.amount,t.currency||'SGD')+'</td>'+
+      '<td class="text-right mono" style="color:var(--ink-3);font-size:.8rem">'+fmtSGD(sgd)+'</td>'+
+      '<td><button class="btn-ghost" onclick="removeTransaction('+t.id+')">✕</button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+// GOALS
+function addGoal() {
+  var name=document.getElementById('goal-name').value.trim(), target=parseFloat(document.getElementById('goal-target').value)||0;
+  var current=parseFloat(document.getElementById('goal-current').value)||0, date=document.getElementById('goal-date').value;
+  var color=document.getElementById('goal-color').value;
+  if(!name||!target) return;
+  state.goals.push({id:Date.now(),name:name,target:target,current:current,date:date,color:color});
+  document.getElementById('goal-name').value=''; document.getElementById('goal-target').value='';
+  document.getElementById('goal-current').value=''; document.getElementById('goal-date').value='';
+  saveState(); renderGoals();
+}
+function updateGoal(id) {
+  var g=state.goals.find(function(g){return g.id===id;}); if(!g) return;
+  var v=parseFloat(prompt('Update saved amount for "'+g.name+'" (SGD):',g.current));
+  if(!isNaN(v)){g.current=Math.max(0,v);saveState();renderGoals();}
+}
+function removeGoal(id) { state.goals=state.goals.filter(function(g){return g.id!==id;}); saveState(); renderGoals(); }
+
+function renderGoals() {
+  var grid=document.getElementById('goals-grid');
+  if(!state.goals.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎯</div>No savings goals yet.</div>';return;}
+  grid.innerHTML=state.goals.map(function(g){
+    var pct=Math.min(100,g.target>0?(g.current/g.target)*100:0);
+    var days=g.date?Math.max(0,Math.round((new Date(g.date)-new Date())/86400000)):null;
+    return '<div class="goal-card" style="border-top:3px solid var(--'+g.color+')">'+
+      '<div class="goal-header"><div class="goal-name">'+g.name+'</div><div class="goal-pct">'+Math.round(pct)+'%</div></div>'+
+      '<div class="progress-bar"><div class="progress-fill '+g.color+'" style="width:'+pct+'%"></div></div>'+
+      '<div class="goal-amounts"><span>'+fmtSGD(g.current)+' saved</span><span>'+fmtSGD(g.target)+' goal</span></div>'+
+      (g.date?'<div style="font-size:.72rem;color:var(--ink-3);margin-top:6px">📅 '+days+' days remaining</div>':'')+
+      '<div style="margin-top:.75rem;display:flex;gap:.5rem">'+
+      '<button class="btn" style="flex:1;padding:6px;font-size:.8rem" onclick="updateGoal('+g.id+')">Update Amount</button>'+
+      '<button class="btn-ghost" onclick="removeGoal('+g.id+')">✕</button></div></div>';
+  }).join('');
+}
+
+// DASHBOARD
+function renderDashboard() {
+  var m=state.currentBudgetMonth;
+  var ta=state.assets.reduce(function(s,a){return s+toSGD(a.val,a.cur||'SGD');},0);
+  var tl=state.liabilities.reduce(function(s,a){return s+toSGD(a.val,a.cur||'SGD');},0);
+  var md=getMD(m);
+  var mfx=getMonthFX(m);
+  var cvt=function(amt,cur){return cur==='SGD'?amt:amt/(mfx[cur]||1);};
+  var budg=md.items.reduce(function(s,i){return s+cvt(i.amt,i.cur);},0);
+  var actSGD=md.actual?cvt(md.actual.amt,md.actual.cur):null;
+  var vv=actSGD!==null?budg-actSGD:null;
+
+  document.getElementById('dash-month-label').textContent=mLabel(m);
+  document.getElementById('dash-stats').innerHTML=
+    '<div class="stat-card green"><div class="stat-label">Net Worth</div><div class="stat-value green mono">'+fmtSGD(ta-tl)+'</div><div class="stat-change">Assets: '+fmtSGD(ta)+'</div></div>'+
+    '<div class="stat-card blue"><div class="stat-label">Monthly Budget</div><div class="stat-value blue mono">'+fmtSGD(budg)+'</div><div class="stat-change">'+mLabel(m)+'</div></div>'+
+    '<div class="stat-card red"><div class="stat-label">Actual Spent</div><div class="stat-value mono" style="color:'+(actSGD!==null?'var(--red)':'var(--ink-3)')+'">'+( actSGD!==null?fmtSGD(actSGD):'—')+'</div><div class="stat-change">'+(actSGD!==null?'Recorded':'Not entered yet')+'</div></div>'+
+    '<div class="stat-card gold"><div class="stat-label">Variance</div><div class="stat-value mono" style="color:'+(vv!==null?(vv>=0?'var(--green)':'var(--red)'):'var(--ink-3)')+'">'+( vv!==null?(vv>=0?'Under ':'Over ')+fmtSGD(Math.abs(vv)):'—')+'</div></div>';
+
+  document.getElementById('dash-budget-overview').innerHTML = md.items.length ? md.items.slice(0,7).map(function(i){
+    var sgd=cvt(i.amt,i.cur), pct=budg>0?(sgd/budg*100):0;
+    return '<div style="display:flex;align-items:center;gap:.75rem;padding:7px 0;border-bottom:1px solid var(--paper-2)">'+
+      '<div style="font-size:.875rem;font-weight:500;min-width:110px">'+i.name+'</div>'+
+      '<div style="flex:1"><div class="progress-bar"><div class="progress-fill blue" style="width:'+pct+'%"></div></div></div>'+
+      '<div class="mono" style="font-size:.78rem;min-width:90px;text-align:right">'+fmtSGD(sgd)+'</div></div>';
+  }).join('') : '<div class="empty"><div class="empty-icon">📊</div>No budget items this month.</div>';
+
+  document.getElementById('dash-recent-tx').innerHTML = state.transactions.length ? state.transactions.slice(0,8).map(function(t){
+    return '<div class="al-item">'+
+      '<div><div style="font-weight:500;font-size:.875rem">'+t.desc+'</div><div style="font-size:.7rem;color:var(--ink-3)">'+t.date+' · '+(t.category||'—')+'</div></div>'+
+      '<span class="mono '+(t.type==='income'?'text-green':'text-red')+'" style="font-size:.85rem">'+(t.type==='income'?'+':'-')+fmtCurDec(t.amount,t.currency||'SGD')+'</span></div>';
+  }).join('') : '<div class="empty"><div class="empty-icon">📋</div>No transactions yet.</div>';
+
+  renderNWChart('nwChart');
+}
+
+// NW CHART
 function renderNWChart(id) {
   if(charts[id]){charts[id].destroy();}
-  const canvas=document.getElementById(id); if(!canvas) return;
+  var canvas=document.getElementById(id); if(!canvas) return;
   if(!state.nwHistory.length){
-    const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
+    var ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle='#8891a8'; ctx.font='13px DM Sans'; ctx.textAlign='center';
     ctx.fillText('Save a net worth snapshot to see your trend.',canvas.width/2,100); return;
   }
   charts[id]=new Chart(canvas,{type:'line',data:{
-    labels:state.nwHistory.map(d=>mShort(d.month)),
-    datasets:[{data:state.nwHistory.map(d=>d.nw),borderColor:'#2d7a4f',backgroundColor:'rgba(45,122,79,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#2d7a4f',pointRadius:5,borderWidth:2.5}]
+    labels:state.nwHistory.map(function(d){return mShort(d.month);}),
+    datasets:[{data:state.nwHistory.map(function(d){return d.nw;}),borderColor:'#2d7a4f',backgroundColor:'rgba(45,122,79,0.08)',fill:true,tension:0.4,pointBackgroundColor:'#2d7a4f',pointRadius:5,borderWidth:2.5}]
   },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
     x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#8891a8'}},
-    y:{grid:{color:'#eeecea'},ticks:{font:{family:'DM Mono',size:11},color:'#8891a8',callback:v=>'S$'+Math.round(v/1000)+'k'}}
+    y:{grid:{color:'#eeecea'},ticks:{font:{family:'DM Mono',size:11},color:'#8891a8',callback:function(v){return 'S$'+Math.round(v/1000)+'k';}}}
   }}});
 }
 
-// ── INIT ───────────────────────────────────────────────────────────────────────
+// RENDER ALL
 function renderAll() {
   renderNetWorth(); renderBudget(); renderSummary(); renderSpendingChart(); renderTransactions(); renderGoals(); renderDashboard();
 }
 
-load();
-document.getElementById('tx-date').value=new Date().toISOString().slice(0,10);
-document.getElementById('nw-hist-month').value=new Date().toISOString().slice(0,7);
-document.getElementById('headerDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+// INIT
+loadState();
+document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
+document.getElementById('nw-hist-month').value = new Date().toISOString().slice(0,7);
+document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+document.getElementById('trend-line-legend').style.background = '#2d7a4f';
 renderAll();
 loadFX();
 </script>
