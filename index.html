@@ -105,12 +105,15 @@
   .month-nav button:hover { border-color: var(--gold); color: var(--gold); }
   .month-label { font-family: 'DM Serif Display', serif; font-size: 1.25rem; min-width: 170px; text-align: center; }
 
-  /* Budget items — 6 cols now: name, cat, original, SGD, THB, delete */
-  .bud-col-header { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 0 0 8px 0; border-bottom: 2px solid var(--paper-3); margin-bottom: 2px; }
+  /* Budget items — 7 cols: name, cat, original, SGD, AUD, THB, delete */
+  .bud-col-header { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 0 0 8px 0; border-bottom: 2px solid var(--paper-3); margin-bottom: 2px; }
   .bud-col-header span { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
-  .bud-item-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 36px; gap: 0.75rem; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--paper-2); }
+  .bud-item-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--paper-2); }
   .bud-item-row:last-child { border-bottom: none; }
-  .bud-total-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 12px 0 0 0; border-top: 2px solid var(--ink); margin-top: 8px; }
+  .bud-total-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 12px 0 0 0; border-top: 2px solid var(--ink); margin-top: 8px; }
+  .col-sgd { color: var(--green); font-weight: 600; }
+  .col-aud { color: #b8860b; font-weight: 600; }
+  .col-thb { color: var(--blue); font-weight: 600; }
 
   /* Actual block */
   .actual-block { background: var(--paper); border-radius: var(--radius-sm); padding: 1.25rem 1.5rem; margin-top: 1.25rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; border: 1px solid var(--paper-3); }
@@ -276,13 +279,19 @@
 
     <div class="card-title" style="margin-top:.5rem">Budget Items</div>
     <div class="bud-col-header">
-      <span>Item</span><span>Category</span><span>Original</span><span>SGD Equiv.</span><span>THB Equiv.</span><span></span>
+      <span>Item</span><span>Category</span><span>Original</span>
+      <span style="color:var(--green)">SGD Equiv.</span>
+      <span style="color:#b8860b">AUD Equiv.</span>
+      <span style="color:var(--blue)">THB Equiv.</span>
+      <span></span>
     </div>
     <div id="budget-items-list"></div>
     <div class="bud-total-row" id="bud-total-row" style="display:none">
       <span style="font-weight:700">Total Budgeted</span><span></span><span></span>
-      <span class="mono text-blue" id="bud-items-total" style="font-weight:700">SGD 0</span>
-      <span class="mono" id="bud-items-total-thb" style="font-weight:700;color:var(--gold)">THB 0</span><span></span>
+      <span class="mono col-sgd" id="bud-items-total">SGD 0</span>
+      <span class="mono col-aud" id="bud-items-total-aud">AUD 0</span>
+      <span class="mono col-thb" id="bud-items-total-thb">THB 0</span>
+      <span></span>
     </div>
 
     <!-- Actual expenditure input -->
@@ -323,9 +332,11 @@
   <div style="font-family:'DM Serif Display',serif;font-size:1.15rem;letter-spacing:-0.01em;margin-bottom:.75rem">Spending Trend</div>
   <div class="card">
     <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:10px;background:rgba(176,58,46,0.2);border-radius:2px;display:inline-block"></span> Actual Spent (bars)</div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:2px;background:var(--red);display:inline-block"></span> Trend Line</div>
-      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:2px;background:var(--blue);display:inline-block;border-top:2px dashed var(--blue)"></span> Budgeted</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:10px;background:rgba(45,122,79,0.25);border:1.5px solid rgba(45,122,79,0.8);border-radius:2px;display:inline-block"></span> SGD</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:10px;background:rgba(184,134,11,0.25);border:1.5px solid rgba(184,134,11,0.8);border-radius:2px;display:inline-block"></span> AUD</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:10px;background:rgba(37,99,168,0.25);border:1.5px solid rgba(37,99,168,0.8);border-radius:2px;display:inline-block"></span> THB</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:2px;background:var(--green);display:inline-block"></span> SGD Trend</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)"><span style="width:28px;height:0;border-top:2px dashed var(--red);display:inline-block"></span> Budgeted</div>
     </div>
     <div style="height:260px;position:relative"><canvas id="spendingChart"></canvas></div>
   </div>
@@ -510,13 +521,15 @@ function renderBudget() {
   const m = state.currentBudgetMonth;
   const md = getMD(m);
   const totalSGD = md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0);
+  const totalAUD = totalSGD * (fxRates['AUD']||1.12);
   const totalTHB = totalSGD * (fxRates['THB']||27.5);
 
   document.getElementById('budget-month-label').textContent = mLabel(m);
   document.getElementById('add-item-form').style.display = 'block';
   document.getElementById('bud-total').textContent = S(totalSGD);
   document.getElementById('bud-items-total').textContent = S(totalSGD);
-  document.getElementById('bud-items-total-thb').textContent = 'THB '+Math.round(totalTHB).toLocaleString();
+  document.getElementById('bud-items-total-aud').textContent = 'AUD '+Math.round(totalAUD).toLocaleString();
+  document.getElementById('bud-items-total-thb').textContent = '฿'+Math.round(totalTHB).toLocaleString();
   document.getElementById('bud-total-row').style.display = md.items.length ? 'grid' : 'none';
 
   // Actual
@@ -550,14 +563,16 @@ function renderBudget() {
   }
   list.innerHTML = md.items.map(item=>{
     const sgd = toSGD(item.amt, item.cur);
+    const aud = sgd * (fxRates['AUD']||1.12);
     const thb = sgd * (fxRates['THB']||27.5);
     return `
     <div class="bud-item-row">
       <span style="font-weight:500">${item.name}</span>
       <span style="font-size:.8rem;color:var(--ink-3)">${item.cat||'—'}</span>
       <span class="mono" style="font-size:.82rem;color:var(--ink-3)">${C(item.amt,item.cur)}</span>
-      <span class="mono text-blue" style="font-weight:600">${S(sgd)}</span>
-      <span class="mono" style="font-weight:600;color:var(--gold)">฿${Math.round(thb).toLocaleString()}</span>
+      <span class="mono col-sgd">${S(sgd)}</span>
+      <span class="mono col-aud">AUD ${Math.round(aud).toLocaleString()}</span>
+      <span class="mono col-thb">฿${Math.round(thb).toLocaleString()}</span>
       <button class="btn-ghost" style="padding:3px 8px;font-size:.75rem" onclick="removeBudgetItem(${item.id})">✕</button>
     </div>`;
   }).join('');
@@ -802,27 +817,19 @@ function renderSpendingChart() {
   const months = lastNMonths(summaryFilter);
   const labels = months.map(m => mShort(m));
 
-  const actuals  = months.map(m => {
-    const md = state.budgetMonths[m];
-    return md?.actual ? toSGD(md.actual.amt, md.actual.cur) : null;
-  });
-  const budgeted = months.map(m => {
-    const md = state.budgetMonths[m];
-    return md ? md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0) : null;
-  });
+  const actualsSGD = months.map(m => { const md=state.budgetMonths[m]; return md?.actual ? toSGD(md.actual.amt,md.actual.cur) : null; });
+  const actualsAUD = actualsSGD.map(v => v !== null ? v * (fxRates['AUD']||1.12) : null);
+  const actualsTHB = actualsSGD.map(v => v !== null ? v * (fxRates['THB']||27.5) : null);
+  const budgeted   = months.map(m => { const md=state.budgetMonths[m]; return md ? md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0)||null : null; });
 
-  // Compute linear trend line over non-null actuals
-  const validActuals = actuals.map((v,i)=>v!==null?{x:i,y:v}:null).filter(Boolean);
-  let trendData = new Array(months.length).fill(null);
-  if (validActuals.length >= 2) {
-    const n = validActuals.length;
-    const sumX = validActuals.reduce((s,p)=>s+p.x,0);
-    const sumY = validActuals.reduce((s,p)=>s+p.y,0);
-    const sumXY = validActuals.reduce((s,p)=>s+p.x*p.y,0);
-    const sumXX = validActuals.reduce((s,p)=>s+p.x*p.x,0);
-    const slope = (n*sumXY - sumX*sumY) / (n*sumXX - sumX*sumX);
-    const intercept = (sumY - slope*sumX) / n;
-    trendData = months.map((_,i) => Math.round(intercept + slope*i));
+  // Trend line over SGD actuals
+  const valid = actualsSGD.map((v,i)=>v!==null?{x:i,y:v}:null).filter(Boolean);
+  let trend = new Array(months.length).fill(null);
+  if (valid.length >= 2) {
+    const n=valid.length, sx=valid.reduce((s,p)=>s+p.x,0), sy=valid.reduce((s,p)=>s+p.y,0);
+    const sxy=valid.reduce((s,p)=>s+p.x*p.y,0), sxx=valid.reduce((s,p)=>s+p.x*p.x,0);
+    const slope=(n*sxy-sx*sy)/(n*sxx-sx*sx), intercept=(sy-slope*sx)/n;
+    trend = months.map((_,i)=>Math.round(intercept+slope*i));
   }
 
   charts['spending'] = new Chart(canvas, {
@@ -830,59 +837,28 @@ function renderSpendingChart() {
     data: {
       labels,
       datasets: [
-        {
-          type: 'bar',
-          label: 'Actual Spent (SGD)',
-          data: actuals,
-          backgroundColor: 'rgba(176,58,46,0.18)',
-          borderColor: 'rgba(176,58,46,0.6)',
-          borderWidth: 1.5,
-          borderRadius: 4,
-          order: 3,
-        },
-        {
-          type: 'line',
-          label: 'Trend',
-          data: trendData,
-          borderColor: '#b03a2e',
-          borderWidth: 2.5,
-          pointRadius: 0,
-          tension: 0.4,
-          fill: false,
-          order: 1,
-        },
-        {
-          type: 'line',
-          label: 'Budgeted (SGD)',
-          data: budgeted,
-          borderColor: '#2563a8',
-          borderWidth: 2,
-          borderDash: [6,4],
-          pointRadius: 3,
-          pointBackgroundColor: '#2563a8',
-          tension: 0.3,
-          fill: false,
-          order: 2,
-        }
+        { type:'bar', label:'Actual (SGD)', data:actualsSGD, backgroundColor:'rgba(45,122,79,0.25)', borderColor:'rgba(45,122,79,0.8)', borderWidth:1.5, borderRadius:3, order:4 },
+        { type:'bar', label:'Actual (AUD)', data:actualsAUD, backgroundColor:'rgba(184,134,11,0.25)', borderColor:'rgba(184,134,11,0.8)', borderWidth:1.5, borderRadius:3, order:4 },
+        { type:'bar', label:'Actual (THB)', data:actualsTHB, backgroundColor:'rgba(37,99,168,0.25)', borderColor:'rgba(37,99,168,0.8)', borderWidth:1.5, borderRadius:3, order:4 },
+        { type:'line', label:'SGD Trend', data:trend, borderColor:'#2d7a4f', borderWidth:2.5, pointRadius:0, tension:0.4, fill:false, order:1 },
+        { type:'line', label:'Budgeted (SGD)', data:budgeted, borderColor:'#b03a2e', borderWidth:2, borderDash:[6,4], pointRadius:3, pointBackgroundColor:'#b03a2e', tension:0.3, fill:false, order:2 },
       ]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => ctx.dataset.label + ': ' + (ctx.raw !== null ? S(ctx.raw) : '—')
-          }
-        }
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ display:true, position:'bottom', labels:{ font:{family:'DM Sans',size:11}, color:'#8891a8', boxWidth:12, padding:16 } },
+        tooltip:{ callbacks:{ label: ctx => {
+          if(ctx.raw===null) return null;
+          const cur = ctx.dataset.label.includes('AUD')?'AUD':ctx.dataset.label.includes('THB')?'THB':'SGD';
+          const prefix = cur==='THB'?'฿':cur+' ';
+          return ctx.dataset.label+': '+prefix+Math.round(ctx.raw).toLocaleString();
+        }}}
       },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#8891a8' } },
-        y: { grid: { color: '#eeecea' }, ticks: {
-          font: { family: 'DM Mono', size: 11 }, color: '#8891a8',
-          callback: v => 'S$'+Math.round(v/1000)+'k'
-        }, beginAtZero: true }
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{family:'DM Sans',size:11},color:'#8891a8'} },
+        y:{ grid:{color:'#eeecea'}, ticks:{font:{family:'DM Mono',size:11},color:'#8891a8', callback:v=>'S$'+Math.round(v/1000)+'k'}, beginAtZero:true }
       }
     }
   });
