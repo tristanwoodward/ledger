@@ -168,7 +168,7 @@ tr:hover td { background: var(--paper); }
   <nav>
     <button class="nav-btn active" onclick="showPage('dashboard',this)">Dashboard</button>
     <button class="nav-btn" onclick="showPage('networth',this)">Net Worth</button>
-    <button class="nav-btn" onclick="showPage('budget',this)">Budget</button>
+    <button class="nav-btn" onclick="showPage('budget',this)">Budget / Expenses</button>
     <button class="nav-btn" onclick="showPage('income',this)">Income</button>
     <button class="nav-btn" onclick="showPage('transactions',this)">Transactions</button>
     <button class="nav-btn" onclick="showPage('savings',this)">Savings Goals</button>
@@ -291,7 +291,7 @@ tr:hover td { background: var(--paper); }
 
 <!-- BUDGET -->
 <div class="page" id="page-budget">
-  <div class="section-title">Budget</div>
+  <div class="section-title">Budget / Expenses</div>
   <div class="section-sub">Monthly itemised forecast with live currency conversion.</div>
 
   <div class="fx-bar" id="fx-bar"><span style="color:var(--ink-3);font-style:italic">Loading live rates...</span></div>
@@ -346,9 +346,9 @@ tr:hover td { background: var(--paper); }
     <div class="card-title">Budget Items</div>
     <div class="bud-col-header">
       <span>Item</span><span>Category</span><span>Original</span>
-      <span style="color:var(--green)">S$ Equiv.</span>
-      <span style="color:#b8860b">A$ Equiv.</span>
-      <span style="color:var(--blue)">THB Equiv.</span>
+      <span style="color:var(--green);cursor:pointer;user-select:none" onclick="sortBudgetItems('sgd')" id="sort-sgd">S$ Equiv. ↕</span>
+      <span style="color:#b8860b;cursor:pointer;user-select:none" onclick="sortBudgetItems('aud')" id="sort-aud">A$ Equiv. ↕</span>
+      <span style="color:var(--blue);cursor:pointer;user-select:none" onclick="sortBudgetItems('thb')" id="sort-thb">THB Equiv. ↕</span>
       <span></span>
     </div>
     <div id="budget-items-list"></div>
@@ -425,13 +425,13 @@ tr:hover td { background: var(--paper); }
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem">
       <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
-          <span style="width:28px;height:2px;display:inline-block" id="trend-line-legend"></span> Trend
+          <span style="width:28px;height:2px;background:#e53935;display:inline-block" id="trend-line-legend"></span> Trend
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
-          <span style="width:28px;height:2px;display:inline-block;border-top:2px dotted #2d7a4f" id="avg-line-legend"></span> Average
+          <span style="width:28px;height:0;border-top:2px dotted #7b1fa2;display:inline-block" id="avg-line-legend"></span> Average
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
-          <span style="width:28px;height:0;border-top:2px dashed #b03a2e;display:inline-block"></span> Budgeted
+          <span style="width:28px;height:0;border-top:2px dashed #f57c00;display:inline-block"></span> Budgeted
         </div>
       </div>
       <div style="display:flex;gap:6px">
@@ -654,17 +654,34 @@ function lastNMonths(n) {
 
 // FX
 async function loadFX() {
-  try {
-    var r = await fetch('https://api.exchangerate-api.com/v4/latest/SGD');
-    var d = await r.json();
-    fxRates = d.rates; fxRates.SGD = 1;
-    renderFXBar(true);
-    renderAll();
-  } catch(e) {
-    fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:1.71, USD:1.35 };
-    document.getElementById('fx-bar').innerHTML = '<span style="color:var(--gold)">Using approximate rates — live rates unavailable</span>';
-    renderAll();
+  // Try multiple free APIs in sequence
+  var apis = [
+    'https://open.er-api.com/v6/latest/SGD',
+    'https://api.exchangerate-api.com/v4/latest/SGD',
+    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/sgd.json'
+  ];
+  for (var i = 0; i < apis.length; i++) {
+    try {
+      var r = await fetch(apis[i]);
+      var d = await r.json();
+      // Handle different API response shapes
+      if (d.rates) {
+        fxRates = d.rates; fxRates.SGD = 1;
+      } else if (d.sgd) {
+        // fawazahmed format: sgd.aud = how many AUD per 1 SGD
+        fxRates = { SGD:1 };
+        var pairs = ['aud','thb','gbp','usd'];
+        pairs.forEach(function(c) { if (d.sgd[c]) fxRates[c.toUpperCase()] = d.sgd[c]; });
+      }
+      renderFXBar();
+      renderAll();
+      return;
+    } catch(e) { continue; }
   }
+  // All APIs failed — use approximate fallback rates
+  fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:1.71, USD:1.35 };
+  document.getElementById('fx-bar').innerHTML = '<span style="color:var(--gold)">⚠ Using approximate rates — check your connection</span>';
+  renderAll();
 }
 
 function renderFXBar() {
@@ -688,6 +705,28 @@ function showPage(id, btn) {
 }
 
 // BUDGET
+var budgetSortCol = null;
+var budgetSortDir = -1; // -1 = high to low, 1 = low to high
+
+function sortBudgetItems(col) {
+  if (budgetSortCol === col) {
+    budgetSortDir *= -1; // toggle direction
+  } else {
+    budgetSortCol = col;
+    budgetSortDir = -1; // default high to low
+  }
+  // Update header arrows
+  ['sgd','aud','thb'].forEach(function(c) {
+    var el = document.getElementById('sort-' + c);
+    if (!el) return;
+    var labels = { sgd:'S$ Equiv.', aud:'A$ Equiv.', thb:'THB Equiv.' };
+    var colors = { sgd:'var(--green)', aud:'#b8860b', thb:'var(--blue)' };
+    el.style.color = colors[c];
+    el.textContent = labels[c] + (c === col ? (budgetSortDir === -1 ? ' ↓' : ' ↑') : ' ↕');
+  });
+  renderBudget();
+}
+
 function changeMonth(dir) {
   state.currentBudgetMonth = dir > 0 ? nextMonth(state.currentBudgetMonth) : prevMonth(state.currentBudgetMonth);
   var m = state.currentBudgetMonth;
@@ -807,11 +846,23 @@ function renderBudget() {
   }
 
   // Items list
+  var itemsToRender = md.items.slice(); // copy
+  if (budgetSortCol) {
+    itemsToRender.sort(function(a, b) {
+      var sgdA = cvt(a.amt, a.cur), sgdB = cvt(b.amt, b.cur);
+      var valA, valB;
+      if (budgetSortCol === 'sgd') { valA = sgdA; valB = sgdB; }
+      else if (budgetSortCol === 'aud') { valA = sgdA*(mfx.AUD||1); valB = sgdB*(mfx.AUD||1); }
+      else { valA = sgdA*(mfx.THB||1); valB = sgdB*(mfx.THB||1); }
+      return (valB - valA) * budgetSortDir;
+    });
+  }
+
   var list = document.getElementById('budget-items-list');
   if (!md.items.length) {
     list.innerHTML = '<div class="empty" style="padding:1.5rem"><div class="empty-icon">📋</div>No items yet. Add your first budget item above.</div>';
   } else {
-    list.innerHTML = md.items.map(function(item) {
+    list.innerHTML = itemsToRender.map(function(item) {
       var sgd = cvt(item.amt, item.cur);
       var aud = sgd * (mfx.AUD || 1);
       var thb = sgd * (mfx.THB || 1);
@@ -984,8 +1035,9 @@ function renderSpendingChart() {
   var months = lastNMonths(summaryFilter);
   var labels = months.map(mShort);
   var fxMap  = { SGD:1, AUD:fxRates.AUD||1.12, THB:fxRates.THB||27.5 };  var barClr = { SGD:{bg:'rgba(45,122,79,0.22)',bd:'rgba(45,122,79,0.8)'}, AUD:{bg:'rgba(184,134,11,0.22)',bd:'rgba(184,134,11,0.8)'}, THB:{bg:'rgba(37,99,168,0.22)',bd:'rgba(37,99,168,0.8)'} };
-  var tClr   = { SGD:'#2d7a4f', AUD:'#b8860b', THB:'#2563a8' };
-  var tPfx   = { SGD:'S$', AUD:'A$', THB:'฿' };
+  var trendClr   = { SGD:'#e53935', AUD:'#e53935', THB:'#e53935' };   // red trend line
+  var avgClr     = { SGD:'#7b1fa2', AUD:'#7b1fa2', THB:'#7b1fa2' };   // purple average line
+  var budgetClr  = '#f57c00';  // orange budgeted line
   var cur = chartCur;
 
   var actuals = months.map(function(m) {
@@ -1032,9 +1084,9 @@ function renderSpendingChart() {
       labels: labels,
       datasets: [
         { type:'bar',  label:'Actual',    data:actuals,  backgroundColor:barClr[cur].bg, borderColor:barClr[cur].bd, borderWidth:1.5, borderRadius:4, order:4 },
-        { type:'line', label:'Trend',     data:trend,    borderColor:tClr[cur], borderWidth:2, pointRadius:0, tension:0.4, fill:false, order:2 },
-        { type:'line', label:'Average',   data:avgLine,  borderColor:tClr[cur], borderWidth:2, borderDash:[3,3], pointRadius:0, fill:false, order:3, opacity:0.6 },
-        { type:'line', label:'Budgeted',  data:budgeted, borderColor:'#b03a2e', borderDash:[6,4], borderWidth:2, pointRadius:3, pointBackgroundColor:'#b03a2e', tension:0.3, fill:false, order:1 }
+        { type:'line', label:'Trend',     data:trend,    borderColor:'#e53935', borderWidth:2.5, pointRadius:0, tension:0.4, fill:false, order:2 },
+        { type:'line', label:'Average',   data:avgLine,  borderColor:'#7b1fa2', borderWidth:2, borderDash:[3,3], pointRadius:0, fill:false, order:3 },
+        { type:'line', label:'Budgeted',  data:budgeted, borderColor:'#f57c00', borderDash:[6,4], borderWidth:2, pointRadius:3, pointBackgroundColor:'#f57c00', tension:0.3, fill:false, order:1 }
       ]
     },
     options: {
