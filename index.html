@@ -294,7 +294,7 @@ tr:hover td { background: var(--paper); }
   <div class="section-title">Budget / Expenses</div>
   <div class="section-sub">Monthly itemised forecast with live currency conversion.</div>
 
-  <div class="fx-bar" id="fx-bar"><span style="color:var(--ink-3);font-style:italic">Loading live rates...</span></div>
+  <div class="fx-bar" id="fx-bar"><span style="color:var(--ink-3);font-style:italic">Loading live rates...</span> <button onclick="loadFX()" style="background:none;border:1px solid var(--paper-3);border-radius:4px;padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--ink-3);font-family:'DM Sans',sans-serif">Refresh</button></div>
 
   <div class="stat-grid">
     <div class="stat-card blue"><div class="stat-label">Total Budgeted</div><div class="stat-value blue mono" id="bud-total">S$0</div></div>
@@ -691,6 +691,7 @@ function renderFXBar() {
     html += '<span>1 SGD = <span class="fx-rate">' + rate.toFixed(c==='THB'?2:4) + ' ' + c + '</span></span>';
     if (i < pairs.length-1) html += '<span style="color:var(--paper-3);padding:0 4px">|</span>';
   }
+  html += '<button onclick="loadFX()" style="background:none;border:1px solid var(--paper-3);border-radius:4px;padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--ink-3);font-family:\'DM Sans\',sans-serif;margin-left:auto">↺ Refresh</button>';
   document.getElementById('fx-bar').innerHTML = html;
 }
 
@@ -701,6 +702,10 @@ function showPage(id, btn) {
   document.getElementById('page-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
   renderAll();
+  // Render page-specific charts after page is visible
+  if (id === 'budget') renderSpendingChart();
+  if (id === 'networth') renderNWChart('nwChart2');
+  if (id === 'income') { renderIncMonthChart(); renderIncYoyChart(); }
 }
 
 // BUDGET
@@ -1547,8 +1552,14 @@ function renderIncYoyChart() {
 
 
 function renderAll() {
-  renderNetWorth(); renderBudget(); renderSummary(); renderSpendingChart();
+  renderNetWorth(); renderBudget(); renderSummary();
   renderIncome(); renderTransactions(); renderGoals(); renderDashboard();
+  // Charts are rendered by showPage when their page becomes active
+  var ap = document.querySelector('.page.active');
+  if (ap) {
+    if (ap.id === 'page-budget') renderSpendingChart();
+    if (ap.id === 'page-networth') renderNWChart('nwChart2');
+  }
 }
 
 function renderDashboard() {
