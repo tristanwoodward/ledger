@@ -158,6 +158,7 @@ tr:hover td { background: var(--paper); }
 
 @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 .page.active .card, .page.active .stat-card { animation: fadeUp 0.3s ease both; }
+.stat-card.blue2::before { background: #b8860b; }
 </style>
 </head>
 <body>
@@ -168,6 +169,7 @@ tr:hover td { background: var(--paper); }
     <button class="nav-btn active" onclick="showPage('dashboard',this)">Dashboard</button>
     <button class="nav-btn" onclick="showPage('networth',this)">Net Worth</button>
     <button class="nav-btn" onclick="showPage('budget',this)">Budget</button>
+    <button class="nav-btn" onclick="showPage('income',this)">Income</button>
     <button class="nav-btn" onclick="showPage('transactions',this)">Transactions</button>
     <button class="nav-btn" onclick="showPage('savings',this)">Savings Goals</button>
   </nav>
@@ -430,6 +432,76 @@ tr:hover td { background: var(--paper); }
   </div>
   <div class="goals-grid" id="goals-grid">
     <div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎯</div>No savings goals yet.</div>
+  </div>
+</div>
+
+<!-- INCOME -->
+<div class="page" id="page-income">
+  <div class="section-title">Income</div>
+  <div class="section-sub">Dividend payments — logged, amortised, and tracked year on year.</div>
+
+  <!-- Year nav -->
+  <div class="month-nav" style="margin-bottom:1.5rem">
+    <button onclick="changeIncomeYear(-1)">&#8592;</button>
+    <div class="month-label" id="income-year-label" style="min-width:80px"></div>
+    <button onclick="changeIncomeYear(1)">&#8594;</button>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="stat-grid">
+    <div class="stat-card green"><div class="stat-label">Annual Total (SGD)</div><div class="stat-value green mono" id="inc-total-sgd">S$0</div></div>
+    <div class="stat-card gold"><div class="stat-label">Annual Total (AUD)</div><div class="stat-value gold mono" id="inc-total-aud">A$0</div></div>
+    <div class="stat-card blue"><div class="stat-label">Monthly Average (SGD)</div><div class="stat-value blue mono" id="inc-avg-sgd">S$0</div></div>
+    <div class="stat-card blue"><div class="stat-label">Monthly Average (AUD)</div><div class="stat-value mono" id="inc-avg-aud" style="color:#b8860b">A$0</div></div>
+    <div class="stat-card gold"><div class="stat-label">Payments This Year</div><div class="stat-value gold mono" id="inc-count">0</div></div>
+  </div>
+
+  <!-- Add dividend -->
+  <div class="card">
+    <div class="card-title">Log Dividend Payment</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date Paid</label><input id="inc-date" type="date"></div>
+      <div class="form-group"><label>Amount (SGD)</label><input id="inc-amount" type="number" placeholder="0"></div>
+      <div class="form-group"><label>AUD Rate (1 SGD = ? AUD)</label><input id="inc-fx-aud" type="number" step="0.0001" placeholder="auto"></div>
+      <div class="form-group"><label>Notes (optional)</label><input id="inc-notes" placeholder="e.g. Q1 dividend"></div>
+      <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addDividend()">+ Log Payment</button></div>
+    </div>
+  </div>
+
+  <!-- Dividend log table -->
+  <div class="card">
+    <div class="card-title">Payment Log — <span id="inc-table-year"></span></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Date</th><th>Amount (SGD)</th><th>Rate (1 SGD)</th><th>Amount (AUD)</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="inc-table-body"></tbody>
+      </table>
+      <div class="empty" id="inc-empty" style="display:none"><div class="empty-icon">💰</div>No dividends logged for this year.</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="two-col">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+        <div class="card-title" style="margin-bottom:0">Monthly Amortisation</div>
+        <div style="display:flex;gap:6px">
+          <button id="inc-toggle-sgd" onclick="setIncChartCur('SGD')" style="background:rgba(45,122,79,0.85);color:#fff;border:none;border-radius:100px;padding:4px 14px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">S$</button>
+          <button id="inc-toggle-aud" onclick="setIncChartCur('AUD')" style="background:none;color:#b8860b;border:2px solid #b8860b;border-radius:100px;padding:4px 14px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">A$</button>
+        </div>
+      </div>
+      <div style="height:220px;position:relative"><canvas id="incMonthChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+        <div class="card-title" style="margin-bottom:0">Year on Year</div>
+        <div style="display:flex;gap:6px">
+          <button id="yoy-toggle-sgd" onclick="setYoyChartCur('SGD')" style="background:rgba(45,122,79,0.85);color:#fff;border:none;border-radius:100px;padding:4px 14px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">S$</button>
+          <button id="yoy-toggle-aud" onclick="setYoyChartCur('AUD')" style="background:none;color:#b8860b;border:2px solid #b8860b;border-radius:100px;padding:4px 14px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">A$</button>
+        </div>
+      </div>
+      <div style="height:220px;position:relative"><canvas id="incYoyChart"></canvas></div>
+    </div>
   </div>
 </div>
 
@@ -1045,14 +1117,228 @@ function renderNWChart(id) {
   }}});
 }
 
-// RENDER ALL
+// INCOME
+var incomeYear = new Date().getFullYear();
+var incChartCur = 'SGD';
+var yoyChartCur = 'SGD';
+
+function changeIncomeYear(dir) {
+  incomeYear += dir;
+  renderIncome();
+}
+
+function addDividend() {
+  var date   = document.getElementById('inc-date').value;
+  var amount = parseFloat(document.getElementById('inc-amount').value) || 0;
+  var fxAUD  = parseFloat(document.getElementById('inc-fx-aud').value);
+  var notes  = document.getElementById('inc-notes').value.trim();
+  if (!date || !amount) return;
+
+  // Auto-populate AUD rate from live rates if not provided
+  // fxRates.AUD = units of AUD per 1 SGD
+  if (!fxAUD) fxAUD = fxRates.AUD ? fxRates.AUD : 1.12;
+
+  if (!state.dividends) state.dividends = [];
+  state.dividends.push({ id: Date.now(), date: date, amount: amount, fxAUD: fxAUD, notes: notes });
+  state.dividends.sort(function(a,b){ return a.date.localeCompare(b.date); });
+
+  document.getElementById('inc-date').value = '';
+  document.getElementById('inc-amount').value = '';
+  document.getElementById('inc-fx-aud').value = '';
+  document.getElementById('inc-notes').value = '';
+  saveState(); renderIncome(); renderDashboard();
+}
+
+function removeDividend(id) {
+  state.dividends = (state.dividends||[]).filter(function(d){ return d.id !== id; });
+  saveState(); renderIncome(); renderDashboard();
+}
+
+function getYearDividends(year) {
+  return (state.dividends||[]).filter(function(d){ return d.date.startsWith(''+year); });
+}
+
+function setIncChartCur(cur) {
+  incChartCur = cur;
+  var actClr = { SGD:'rgba(45,122,79,0.85)', AUD:'rgba(184,134,11,0.85)' };
+  ['SGD','AUD'].forEach(function(c) {
+    var btn = document.getElementById('inc-toggle-' + c.toLowerCase());
+    if (!btn) return;
+    btn.style.background = c===cur ? actClr[c] : 'none';
+    btn.style.color = c===cur ? '#fff' : (c==='SGD'?'var(--green)':'#b8860b');
+    btn.style.border = c===cur ? 'none' : '2px solid ' + (c==='SGD'?'var(--green)':'#b8860b');
+  });
+  renderIncMonthChart();
+}
+
+function setYoyChartCur(cur) {
+  yoyChartCur = cur;
+  var actClr = { SGD:'rgba(45,122,79,0.85)', AUD:'rgba(184,134,11,0.85)' };
+  ['SGD','AUD'].forEach(function(c) {
+    var btn = document.getElementById('yoy-toggle-' + c.toLowerCase());
+    if (!btn) return;
+    btn.style.background = c===cur ? actClr[c] : 'none';
+    btn.style.color = c===cur ? '#fff' : (c==='SGD'?'var(--green)':'#b8860b');
+    btn.style.border = c===cur ? 'none' : '2px solid ' + (c==='SGD'?'var(--green)':'#b8860b');
+  });
+  renderIncYoyChart();
+}
+
+function renderIncome() {
+  if (!state.dividends) state.dividends = [];
+  document.getElementById('inc-date').value = document.getElementById('inc-date').value || new Date().toISOString().slice(0,10);
+
+  // Auto-fill AUD rate placeholder from live rates
+  var audPlaceholder = fxRates.AUD ? fxRates.AUD.toFixed(4) : '1.1200';
+  document.getElementById('inc-fx-aud').placeholder = audPlaceholder + ' (live)';
+
+  var yr = incomeYear;
+  document.getElementById('income-year-label').textContent = yr;
+  document.getElementById('inc-table-year').textContent = yr;
+
+  var divs = getYearDividends(yr);
+  var totalSGD = divs.reduce(function(s,d){ return s+d.amount; }, 0);
+  var totalAUD = divs.reduce(function(s,d){ return s+(d.amount * d.fxAUD); }, 0);
+  var avgSGD = totalSGD / 12;
+  var avgAUD = totalAUD / 12;
+
+  document.getElementById('inc-total-sgd').textContent = fmtSGD(totalSGD);
+  document.getElementById('inc-total-aud').textContent = 'A$' + Math.round(totalAUD).toLocaleString('en-US');
+  document.getElementById('inc-avg-sgd').textContent = fmtSGD(avgSGD);
+  document.getElementById('inc-avg-aud').textContent = 'A$' + Math.round(avgAUD).toLocaleString('en-US');
+  document.getElementById('inc-count').textContent = divs.length;
+
+  // Table
+  var tbody = document.getElementById('inc-table-body');
+  var empty = document.getElementById('inc-empty');
+  if (!divs.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = divs.map(function(d) {
+      var audAmt = d.amount * d.fxAUD;
+      return '<tr>' +
+        '<td class="mono" style="font-size:.85rem">' + d.date + '</td>' +
+        '<td class="mono col-sgd" style="font-weight:600">' + fmtSGD(d.amount) + '</td>' +
+        '<td class="mono" style="color:var(--ink-3);font-size:.82rem">' + parseFloat(d.fxAUD).toFixed(4) + '</td>' +
+        '<td class="mono col-aud" style="font-weight:600">A$' + Math.round(audAmt).toLocaleString('en-US') + '</td>' +
+        '<td style="color:var(--ink-3);font-size:.85rem">' + (d.notes||'—') + '</td>' +
+        '<td><button class="btn-ghost" onclick="removeDividend(' + d.id + ')">✕</button></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  renderIncMonthChart();
+  renderIncYoyChart();
+}
+
+function renderIncMonthChart() {
+  var canvas = document.getElementById('incMonthChart');
+  if (!canvas) return;
+  if (charts.incMonth) { charts.incMonth.destroy(); }
+
+  var yr = incomeYear;
+  var divs = getYearDividends(yr);
+  var totalSGD = divs.reduce(function(s,d){ return s+d.amount; }, 0);
+  var totalAUD = divs.reduce(function(s,d){ return s+(d.amount*d.fxAUD); }, 0);
+  var avgSGD = totalSGD / 12;
+  var avgAUD = totalAUD / 12;
+
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var cur = incChartCur;
+
+  // Individual payments per month
+  var payments = months.map(function(_,i) {
+    var mo = (i+1 < 10 ? '0'+(i+1) : ''+(i+1));
+    var prefix = yr + '-' + mo;
+    var mDivs = divs.filter(function(d){ return d.date.startsWith(prefix); });
+    if (!mDivs.length) return null;
+    var val = mDivs.reduce(function(s,d){ return s+(cur==='SGD'?d.amount:d.amount*d.fxAUD); }, 0);
+    return val;
+  });
+
+  var avg = cur === 'SGD' ? avgSGD : avgAUD;
+  var avgLine = months.map(function(){ return Math.round(avg); });
+  var pfx = cur === 'SGD' ? 'S$' : 'A$';
+  var barClr = cur === 'SGD' ? 'rgba(45,122,79,0.7)' : 'rgba(184,134,11,0.7)';
+  var lineClr = cur === 'SGD' ? '#2d7a4f' : '#b8860b';
+
+  charts.incMonth = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        { type:'bar',  label:'Payment',        data:payments, backgroundColor:barClr, borderRadius:4, order:2 },
+        { type:'line', label:'Monthly Average', data:avgLine,  borderColor:lineClr, borderWidth:2.5, borderDash:[6,3], pointRadius:0, fill:false, order:1 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:function(ctx){
+        if(ctx.raw===null) return null;
+        return ctx.dataset.label+': '+pfx+Math.round(ctx.raw).toLocaleString('en-US');
+      }}}},
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{family:'DM Sans',size:11},color:'#8891a8'} },
+        y:{ grid:{color:'#eeecea'}, beginAtZero:true, ticks:{font:{family:'DM Mono',size:11},color:'#8891a8', callback:function(v){ return pfx+Math.round(v/1000)+'k'; }} }
+      }
+    }
+  });
+}
+
+function renderIncYoyChart() {
+  var canvas = document.getElementById('incYoyChart');
+  if (!canvas) return;
+  if (charts.incYoy) { charts.incYoy.destroy(); }
+
+  var currentYear = new Date().getFullYear();
+  var years = [];
+  for (var y = 2020; y <= currentYear; y++) years.push(y);
+
+  var cur = yoyChartCur;
+  var pfx = cur === 'SGD' ? 'S$' : 'A$';
+  var barClr = cur === 'SGD' ? 'rgba(45,122,79,0.75)' : 'rgba(184,134,11,0.75)';
+  var bdClr  = cur === 'SGD' ? 'rgba(45,122,79,1)'    : 'rgba(184,134,11,1)';
+
+  var data = years.map(function(yr) {
+    var divs = getYearDividends(yr);
+    if (!divs.length) return null;
+    return divs.reduce(function(s,d){ return s+(cur==='SGD'?d.amount:d.amount*d.fxAUD); }, 0);
+  });
+
+  charts.incYoy = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: years.map(String),
+      datasets: [{ label:'Annual Total', data:data, backgroundColor:barClr, borderColor:bdClr, borderWidth:1.5, borderRadius:5 }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:function(ctx){
+        if(ctx.raw===null) return null;
+        return pfx+Math.round(ctx.raw).toLocaleString('en-US');
+      }}}},
+      scales:{
+        x:{ grid:{display:false}, ticks:{font:{family:'DM Sans',size:11},color:'#8891a8'} },
+        y:{ grid:{color:'#eeecea'}, beginAtZero:true, ticks:{font:{family:'DM Mono',size:11},color:'#8891a8', callback:function(v){ return pfx+Math.round(v/1000)+'k'; }} }
+      }
+    }
+  });
+}
+
+
 function renderAll() {
-  renderNetWorth(); renderBudget(); renderSummary(); renderSpendingChart(); renderTransactions(); renderGoals(); renderDashboard();
+  renderNetWorth(); renderBudget(); renderSummary(); renderSpendingChart();
+  renderIncome(); renderTransactions(); renderGoals(); renderDashboard();
 }
 
 // INIT
 loadState();
+if (!state.dividends) state.dividends = [];
 document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
+document.getElementById('inc-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('nw-hist-month').value = new Date().toISOString().slice(0,7);
 document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
 document.getElementById('trend-line-legend').style.background = '#2d7a4f';
