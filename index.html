@@ -138,6 +138,8 @@
   .summary-tbl tr.row-actual td { color: var(--red); font-weight: 600; }
   .summary-tbl tr.row-actual td:first-child { color: var(--red); }
   .summary-tbl tr.row-variance td { font-weight: 700; }
+  .summary-tbl tr.row-variance-pct td { font-weight: 700; border-bottom: 2px solid var(--paper-3); }
+  .summary-tbl tr.row-variance-pct td:first-child { color: var(--ink-2); font-family: 'DM Sans', sans-serif; }
   .summary-tbl td.pos { color: var(--green); }
   .summary-tbl td.neg { color: var(--red); }
   .summary-tbl td.dim { color: var(--ink-3); opacity: 0.45; font-weight: 300; }
@@ -321,7 +323,12 @@
       <button class="filter-btn" onclick="setSummaryFilter(3,this)">3 Months</button>
       <button class="filter-btn active" onclick="setSummaryFilter(6,this)">6 Months</button>
       <button class="filter-btn" onclick="setSummaryFilter(9,this)">9 Months</button>
-      <button class="filter-btn" onclick="setSummaryFilter(12,this)">12 Months</button>
+      <button class="filter-btn" onclick="setSummaryFilter(12,this)">1 Year</button>
+      <button class="filter-btn" onclick="setSummaryFilter(24,this)">2 Years</button>
+      <button class="filter-btn" onclick="setSummaryFilter(36,this)">3 Years</button>
+      <button class="filter-btn" onclick="setSummaryFilter(48,this)">4 Years</button>
+      <button class="filter-btn" onclick="setSummaryFilter(60,this)">5 Years</button>
+      <button class="filter-btn" onclick="setSummaryFilter(72,this)">6 Years</button>
     </div>
   </div>
   <div class="card" style="padding:1.25rem">
@@ -598,54 +605,64 @@ function lastNMonths(n) {
 
 function renderSummary() {
   const months = lastNMonths(summaryFilter);
-  const allNames = [...new Set(months.flatMap(m=>(state.budgetMonths[m]?.items||[]).map(i=>i.name)))];
   const tbl = document.getElementById('summary-table');
+  const hasAny = months.some(m => state.budgetMonths[m]?.items?.length || state.budgetMonths[m]?.actual);
 
-  let html = `<thead><tr><th>Item</th>${months.map(m=>`<th>${mShort(m)}</th>`).join('')}</tr></thead><tbody>`;
+  let html = `<thead><tr><th></th>${months.map(m=>`<th>${mShort(m)}</th>`).join('')}</tr></thead><tbody>`;
 
-  if (!allNames.length) {
+  if (!hasAny) {
     html += `<tr><td colspan="${months.length+1}" style="text-align:center;color:var(--ink-3);padding:2rem;font-family:'DM Sans',sans-serif">No budget data yet for this period.</td></tr>`;
   } else {
-    allNames.forEach(name => {
-      html += `<tr><td>${name}</td>`;
-      months.forEach(m => {
-        const md = state.budgetMonths[m];
-        const item = md?.items.find(i=>i.name===name);
-        html += item ? `<td>${S(toSGD(item.amt,item.cur))}</td>` : `<td class="dim">—</td>`;
-      });
-      html += '</tr>';
+
+    // Total Budgeted
+    html += `<tr class="row-total"><td>Total Budgeted</td>`;
+    months.forEach(m => {
+      const md = state.budgetMonths[m];
+      const t = md?.items?.length ? md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0) : 0;
+      html += `<td>${t>0 ? S(t) : '<span class="dim">—</span>'}</td>`;
     });
+    html += '</tr>';
+
+    // Actual Spent
+    html += `<tr class="row-actual"><td>Actual Spent</td>`;
+    months.forEach(m => {
+      const md = state.budgetMonths[m];
+      const a = md?.actual ? toSGD(md.actual.amt, md.actual.cur) : null;
+      html += `<td>${a !== null ? S(a) : '<span class="dim">—</span>'}</td>`;
+    });
+    html += '</tr>';
+
+    // Variance $
+    html += `<tr class="row-variance"><td>Variance $</td>`;
+    months.forEach(m => {
+      const md = state.budgetMonths[m];
+      if (!md?.actual) { html += `<td class="dim">—</td>`; return; }
+      const budg = md.items?.reduce((s,i)=>s+toSGD(i.amt,i.cur),0)||0;
+      const act  = toSGD(md.actual.amt, md.actual.cur);
+      const v = budg - act;
+      html += `<td class="${v>=0?'pos':'neg'}">${v>=0?'+':'-'}${S(Math.abs(v))}</td>`;
+    });
+    html += '</tr>';
+
+    // Variance %
+    html += `<tr class="row-variance-pct"><td>Variance %</td>`;
+    months.forEach(m => {
+      const md = state.budgetMonths[m];
+      if (!md?.actual) { html += `<td class="dim">—</td>`; return; }
+      const budg = md.items?.reduce((s,i)=>s+toSGD(i.amt,i.cur),0)||0;
+      const act  = toSGD(md.actual.amt, md.actual.cur);
+      if (budg === 0) { html += `<td class="dim">—</td>`; return; }
+      const pct = ((budg - act) / budg) * 100;
+      const pos = pct >= 0;
+      const arrow = pos
+        ? `<span style="color:var(--green);font-size:1em;line-height:1">▼</span>`
+        : `<span style="color:var(--red);font-size:1em;line-height:1">▲</span>`;
+      html += `<td class="${pos?'pos':'neg'}" style="font-weight:700;white-space:nowrap">${arrow} ${Math.abs(pct).toFixed(1)}%</td>`;
+    });
+    html += '</tr>';
   }
 
-  // Total Budgeted
-  html += `<tr class="row-total"><td>Total Budgeted</td>`;
-  months.forEach(m => {
-    const md = state.budgetMonths[m];
-    const t = md ? md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0) : 0;
-    html += `<td>${t>0?S(t):'<span class="dim">—</span>'}</td>`;
-  });
-  html += '</tr>';
-
-  // Actual Spent
-  html += `<tr class="row-actual"><td>Actual Spent</td>`;
-  months.forEach(m => {
-    const md = state.budgetMonths[m];
-    const a = md?.actual ? toSGD(md.actual.amt, md.actual.cur) : null;
-    html += `<td>${a!==null?S(a):'<span class="dim">—</span>'}</td>`;
-  });
-  html += '</tr>';
-
-  // Variance
-  html += `<tr class="row-variance"><td>Variance</td>`;
-  months.forEach(m => {
-    const md = state.budgetMonths[m];
-    if (!md?.actual) { html+=`<td class="dim">—</td>`; return; }
-    const budg = md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0);
-    const act  = toSGD(md.actual.amt, md.actual.cur);
-    const v = budg - act;
-    html += `<td class="${v>=0?'pos':'neg'}">${v>=0?'+':'-'}${S(Math.abs(v))}</td>`;
-  });
-  html += '</tr></tbody>';
+  html += '</tbody>';
   tbl.innerHTML = html;
 }
 
