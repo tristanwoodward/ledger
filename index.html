@@ -296,6 +296,26 @@
       <span></span>
     </div>
 
+    <!-- Historical FX Override -->
+    <div id="fx-override-block" style="margin-top:1.25rem;padding:1rem 1.25rem;background:var(--paper);border:1px solid var(--paper-3);border-radius:var(--radius-sm)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+        <div>
+          <div style="font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">FX Rates for this Month</div>
+          <div style="font-size:.78rem;color:var(--ink-3);margin-top:2px" id="fx-override-status"></div>
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-sm" onclick="saveFXOverride()">Lock Rates</button>
+          <button class="btn-ghost btn-sm" id="fx-clear-btn" onclick="clearFXOverride()" style="display:none">Clear Override</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem" id="fx-override-inputs">
+        <div class="form-group"><label>AUD → SGD (1 AUD =)</label><input id="fx-aud" type="number" step="0.0001" placeholder="e.g. 0.89"></div>
+        <div class="form-group"><label>THB → SGD (1 THB =)</label><input id="fx-thb" type="number" step="0.0001" placeholder="e.g. 0.037"></div>
+        <div class="form-group"><label>GBP → SGD (1 GBP =)</label><input id="fx-gbp" type="number" step="0.0001" placeholder="e.g. 1.71"></div>
+        <div class="form-group"><label>USD → SGD (1 USD =)</label><input id="fx-usd" type="number" step="0.0001" placeholder="e.g. 1.35"></div>
+      </div>
+    </div>
+
     <!-- Actual expenditure input -->
     <div class="actual-block">
       <div>
@@ -451,9 +471,10 @@ function toSGD(amt, cur) {
 }
 
 // ── UTILS ──────────────────────────────────────────────────────────────────────
-const S = n => 'SGD ' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-const C = (n,c) => (c||'SGD')+' '+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-const CD = (n,c) => (c||'SGD')+' '+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const curSym = c => ({ SGD:'S$', AUD:'A$', THB:'฿', GBP:'£', USD:'US$' }[c] || c+' ');
+const S  = n => 'S$' + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const C  = (n,c) => curSym(c||'SGD') + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const CD = (n,c) => curSym(c||'SGD') + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
 function mLabel(ym) { const [y,m]=ym.split('-'); return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'}); }
 function mShort(ym) { const [y,m]=ym.split('-'); return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'short',year:'2-digit'}); }
@@ -468,7 +489,20 @@ function nextMonth(ym) {
   m++; if(m>12){m=1;y++;}
   return y+'-'+(m<10?'0'+m:m);
 }
-function getMD(m) { if(!state.budgetMonths[m]) state.budgetMonths[m]={items:[],actual:null}; return state.budgetMonths[m]; }
+function getMD(m) { if(!state.budgetMonths[m]) state.budgetMonths[m]={items:[],actual:null,fx:null}; return state.budgetMonths[m]; }
+
+// Returns FX rates for a given month — uses locked rates if set, else live rates
+function getMonthFX(m) {
+  const md = state.budgetMonths[m];
+  if (md?.fx) return md.fx;
+  return fxRates;
+}
+
+function toSGDForMonth(amt, cur, m) {
+  if (!cur || cur === 'SGD') return amt;
+  const rates = getMonthFX(m);
+  return amt / (rates[cur] || 1);
+}
 
 // ── NAV ────────────────────────────────────────────────────────────────────────
 function showPage(id, btn) {
@@ -492,7 +526,63 @@ function changeMonth(dir) {
   renderBudget(); renderSummary(); renderSpendingChart();
 }
 
-function addBudgetItem() {
+function saveFXOverride() {
+  const m = state.currentBudgetMonth;
+  const md = getMD(m);
+  const aud = parseFloat(document.getElementById('fx-aud').value);
+  const thb = parseFloat(document.getElementById('fx-thb').value);
+  const gbp = parseFloat(document.getElementById('fx-gbp').value);
+  const usd = parseFloat(document.getElementById('fx-usd').value);
+  // Store as "units per 1 SGD" to match fxRates format (1/rate)
+  md.fx = {
+    SGD: 1,
+    AUD: aud ? 1/aud : fxRates['AUD'],
+    THB: thb ? 1/thb : fxRates['THB'],
+    GBP: gbp ? 1/gbp : fxRates['GBP'],
+    USD: usd ? 1/usd : fxRates['USD'],
+  };
+  save(); renderBudget(); renderSummary(); renderSpendingChart();
+}
+
+function clearFXOverride() {
+  const m = state.currentBudgetMonth;
+  getMD(m).fx = null;
+  save(); renderBudget(); renderSummary(); renderSpendingChart();
+}
+
+function renderFXOverride() {
+  const m = state.currentBudgetMonth;
+  const md = getMD(m);
+  const clearBtn = document.getElementById('fx-clear-btn');
+  const status = document.getElementById('fx-override-status');
+
+  if (md.fx) {
+    // Show locked rates
+    const toRate = (key) => md.fx[key] ? (1/md.fx[key]).toFixed(4) : '—';
+    document.getElementById('fx-aud').value = toRate('AUD');
+    document.getElementById('fx-thb').value = toRate('THB');
+    document.getElementById('fx-gbp').value = toRate('GBP');
+    document.getElementById('fx-usd').value = toRate('USD');
+    clearBtn.style.display = 'inline-block';
+    status.textContent = '🔒 Using locked historical rates for this month';
+    status.style.color = 'var(--gold)';
+  } else {
+    // Show live rates as placeholder
+    document.getElementById('fx-aud').value = '';
+    document.getElementById('fx-thb').value = '';
+    document.getElementById('fx-gbp').value = '';
+    document.getElementById('fx-usd').value = '';
+    document.getElementById('fx-aud').placeholder = fxRates['AUD'] ? (1/fxRates['AUD']).toFixed(4) : '—';
+    document.getElementById('fx-thb').placeholder = fxRates['THB'] ? (1/fxRates['THB']).toFixed(4) : '—';
+    document.getElementById('fx-gbp').placeholder = fxRates['GBP'] ? (1/fxRates['GBP']).toFixed(4) : '—';
+    document.getElementById('fx-usd').placeholder = fxRates['USD'] ? (1/fxRates['USD']).toFixed(4) : '—';
+    clearBtn.style.display = 'none';
+    status.textContent = 'Using live rates — enter values above to lock historical rates';
+    status.style.color = 'var(--ink-3)';
+  }
+}
+
+
   const m = state.currentBudgetMonth;
   const name = document.getElementById('new-item-name').value.trim();
   const cat  = document.getElementById('new-item-cat').value.trim();
@@ -531,15 +621,17 @@ function editActual() {
 function renderBudget() {
   const m = state.currentBudgetMonth;
   const md = getMD(m);
-  const totalSGD = md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0);
-  const totalAUD = totalSGD * (fxRates['AUD']||1.12);
-  const totalTHB = totalSGD * (fxRates['THB']||27.5);
+  const mfx = getMonthFX(m);
+  const toS = (amt, cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
+  const totalSGD = md.items.reduce((s,i)=>s+toS(i.amt,i.cur),0);
+  const totalAUD = totalSGD * (mfx['AUD']||1.12);
+  const totalTHB = totalSGD * (mfx['THB']||27.5);
 
   document.getElementById('budget-month-label').textContent = mLabel(m);
   document.getElementById('add-item-form').style.display = 'block';
   document.getElementById('bud-total').textContent = S(totalSGD);
   document.getElementById('bud-items-total').textContent = S(totalSGD);
-  document.getElementById('bud-items-total-aud').textContent = 'AUD '+Math.round(totalAUD).toLocaleString();
+  document.getElementById('bud-items-total-aud').textContent = 'A$'+Math.round(totalAUD).toLocaleString();
   document.getElementById('bud-items-total-thb').textContent = '฿'+Math.round(totalTHB).toLocaleString();
   document.getElementById('bud-total-row').style.display = md.items.length ? 'grid' : 'none';
 
@@ -570,23 +662,25 @@ function renderBudget() {
   const list = document.getElementById('budget-items-list');
   if (!md.items.length) {
     list.innerHTML='<div class="empty" style="padding:1.5rem"><div class="empty-icon">📋</div>No items yet. Add your first budget item above.</div>';
+    renderFXOverride();
     return;
   }
   list.innerHTML = md.items.map(item=>{
-    const sgd = toSGD(item.amt, item.cur);
-    const aud = sgd * (fxRates['AUD']||1.12);
-    const thb = sgd * (fxRates['THB']||27.5);
+    const sgd = toS(item.amt, item.cur);
+    const aud = sgd * (mfx['AUD']||1.12);
+    const thb = sgd * (mfx['THB']||27.5);
     return `
     <div class="bud-item-row">
       <span style="font-weight:500">${item.name}</span>
       <span style="font-size:.8rem;color:var(--ink-3)">${item.cat||'—'}</span>
       <span class="mono" style="font-size:.82rem;color:var(--ink-3)">${C(item.amt,item.cur)}</span>
       <span class="mono col-sgd">${S(sgd)}</span>
-      <span class="mono col-aud">AUD ${Math.round(aud).toLocaleString()}</span>
+      <span class="mono col-aud">A$${Math.round(aud).toLocaleString()}</span>
       <span class="mono col-thb">฿${Math.round(thb).toLocaleString()}</span>
       <button class="btn-ghost" style="padding:3px 8px;font-size:.75rem" onclick="removeBudgetItem(${item.id})">✕</button>
     </div>`;
   }).join('');
+  renderFXOverride();
 }
 
 // ── SUMMARY ────────────────────────────────────────────────────────────────────
@@ -618,7 +712,9 @@ function renderSummary() {
     html += `<tr class="row-total"><td>Total Budgeted</td>`;
     months.forEach(m => {
       const md = state.budgetMonths[m];
-      const t = md?.items?.length ? md.items.reduce((s,i)=>s+toSGD(i.amt,i.cur),0) : 0;
+      const mfx = getMonthFX(m);
+      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
+      const t = md?.items?.length ? md.items.reduce((s,i)=>s+toS(i.amt,i.cur),0) : 0;
       html += `<td>${t>0 ? S(t) : '<span class="dim">—</span>'}</td>`;
     });
     html += '</tr>';
@@ -627,7 +723,9 @@ function renderSummary() {
     html += `<tr class="row-actual"><td>Actual Spent</td>`;
     months.forEach(m => {
       const md = state.budgetMonths[m];
-      const a = md?.actual ? toSGD(md.actual.amt, md.actual.cur) : null;
+      const mfx = getMonthFX(m);
+      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
+      const a = md?.actual ? toS(md.actual.amt, md.actual.cur) : null;
       html += `<td>${a !== null ? S(a) : '<span class="dim">—</span>'}</td>`;
     });
     html += '</tr>';
@@ -637,8 +735,10 @@ function renderSummary() {
     months.forEach(m => {
       const md = state.budgetMonths[m];
       if (!md?.actual) { html += `<td class="dim">—</td>`; return; }
-      const budg = md.items?.reduce((s,i)=>s+toSGD(i.amt,i.cur),0)||0;
-      const act  = toSGD(md.actual.amt, md.actual.cur);
+      const mfx = getMonthFX(m);
+      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
+      const budg = md.items?.reduce((s,i)=>s+toS(i.amt,i.cur),0)||0;
+      const act  = toS(md.actual.amt, md.actual.cur);
       const v = budg - act;
       html += `<td class="${v>=0?'pos':'neg'}">${v>=0?'+':'-'}${S(Math.abs(v))}</td>`;
     });
@@ -649,14 +749,14 @@ function renderSummary() {
     months.forEach(m => {
       const md = state.budgetMonths[m];
       if (!md?.actual) { html += `<td class="dim">—</td>`; return; }
-      const budg = md.items?.reduce((s,i)=>s+toSGD(i.amt,i.cur),0)||0;
-      const act  = toSGD(md.actual.amt, md.actual.cur);
+      const mfx = getMonthFX(m);
+      const toS = (amt,cur) => { if(!cur||cur==='SGD') return amt; return amt/(mfx[cur]||1); };
+      const budg = md.items?.reduce((s,i)=>s+toS(i.amt,i.cur),0)||0;
+      const act  = toS(md.actual.amt, md.actual.cur);
       if (budg === 0) { html += `<td class="dim">—</td>`; return; }
       const pct = ((budg - act) / budg) * 100;
       const pos = pct >= 0;
-      const arrow = pos
-        ? `<span style="color:var(--green);font-size:1em;line-height:1">▼</span>`
-        : `<span style="color:var(--red);font-size:1em;line-height:1">▲</span>`;
+      const arrow = pos ? `<span style="color:var(--green)">▼</span>` : `<span style="color:var(--red)">▲</span>`;
       html += `<td class="${pos?'pos':'neg'}" style="font-weight:700;white-space:nowrap">${arrow} ${Math.abs(pct).toFixed(1)}%</td>`;
     });
     html += '</tr>';
