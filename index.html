@@ -654,33 +654,32 @@ function lastNMonths(n) {
 
 // FX
 async function loadFX() {
-  // Try multiple free APIs in sequence
   var apis = [
-    'https://open.er-api.com/v6/latest/SGD',
-    'https://api.exchangerate-api.com/v4/latest/SGD',
-    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/sgd.json'
+    { url:'https://open.er-api.com/v6/latest/SGD', parse: function(d){ return d.rates; } },
+    { url:'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/sgd.json', parse: function(d){
+      if (!d.sgd) return null;
+      var r = { SGD:1 };
+      ['AUD','THB','GBP','USD'].forEach(function(c){ if(d.sgd[c.toLowerCase()]) r[c]=d.sgd[c.toLowerCase()]; });
+      return r;
+    }},
+    { url:'https://api.exchangerate-api.com/v4/latest/SGD', parse: function(d){ return d.rates; } }
   ];
   for (var i = 0; i < apis.length; i++) {
     try {
-      var r = await fetch(apis[i]);
+      var r = await fetch(apis[i].url);
+      if (!r.ok) continue;
       var d = await r.json();
-      // Handle different API response shapes
-      if (d.rates) {
-        fxRates = d.rates; fxRates.SGD = 1;
-      } else if (d.sgd) {
-        // fawazahmed format: sgd.aud = how many AUD per 1 SGD
-        fxRates = { SGD:1 };
-        var pairs = ['aud','thb','gbp','usd'];
-        pairs.forEach(function(c) { if (d.sgd[c]) fxRates[c.toUpperCase()] = d.sgd[c]; });
+      var rates = apis[i].parse(d);
+      if (rates && rates.AUD) {
+        fxRates = rates; fxRates.SGD = 1;
+        renderFXBar();
+        renderAll();
+        return;
       }
-      renderFXBar();
-      renderAll();
-      return;
     } catch(e) { continue; }
   }
-  // All APIs failed — use approximate fallback rates
   fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:1.71, USD:1.35 };
-  document.getElementById('fx-bar').innerHTML = '<span style="color:var(--gold)">⚠ Using approximate rates — check your connection</span>';
+  document.getElementById('fx-bar').innerHTML = '<span style="color:var(--gold)">⚠ Using approximate rates — live rates unavailable</span>';
   renderAll();
 }
 
@@ -1034,11 +1033,13 @@ function renderSpendingChart() {
 
   var months = lastNMonths(summaryFilter);
   var labels = months.map(mShort);
-  var fxMap  = { SGD:1, AUD:fxRates.AUD||1.12, THB:fxRates.THB||27.5 };  var barClr = { SGD:{bg:'rgba(45,122,79,0.22)',bd:'rgba(45,122,79,0.8)'}, AUD:{bg:'rgba(184,134,11,0.22)',bd:'rgba(184,134,11,0.8)'}, THB:{bg:'rgba(37,99,168,0.22)',bd:'rgba(37,99,168,0.8)'} };
-  var trendClr   = { SGD:'#e53935', AUD:'#e53935', THB:'#e53935' };   // red trend line
-  var avgClr     = { SGD:'#7b1fa2', AUD:'#7b1fa2', THB:'#7b1fa2' };   // purple average line
-  var budgetClr  = '#f57c00';  // orange budgeted line
   var cur = chartCur;
+  var fxMap  = { SGD:1, AUD:fxRates.AUD||1.12, THB:fxRates.THB||27.5 };
+  var barClr = { SGD:{bg:'rgba(45,122,79,0.22)',bd:'rgba(45,122,79,0.8)'}, AUD:{bg:'rgba(184,134,11,0.22)',bd:'rgba(184,134,11,0.8)'}, THB:{bg:'rgba(37,99,168,0.22)',bd:'rgba(37,99,168,0.8)'} };
+  var trendClr = { SGD:'#e53935', AUD:'#e53935', THB:'#e53935' };
+  var avgClr   = { SGD:'#7b1fa2', AUD:'#7b1fa2', THB:'#7b1fa2' };
+  var budgetClr = '#f57c00';
+  var tPfx     = { SGD:'S$', AUD:'A$', THB:'฿' };
 
   var actuals = months.map(function(m) {
     var md = state.budgetMonths[m];
