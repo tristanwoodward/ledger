@@ -425,13 +425,13 @@ tr:hover td { background: var(--paper); }
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem">
       <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
-          <span style="width:14px;height:12px;background:rgba(176,58,46,0.25);border:1.5px solid rgba(176,58,46,0.9);border-radius:2px;display:inline-block"></span> Budgeted
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
           <span style="width:14px;height:12px;background:rgba(45,122,79,0.22);border:1.5px solid rgba(45,122,79,0.8);border-radius:2px;display:inline-block" id="actual-bar-legend"></span> Actual
         </div>
         <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
-          <span style="width:28px;height:2px;background:#7b1fa2;display:inline-block" id="avg-line-legend"></span> Average
+          <span style="width:14px;height:12px;background:rgba(176,58,46,0.25);border:1.5px solid rgba(176,58,46,0.85);border-radius:2px;display:inline-block"></span> Budgeted
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-3)">
+          <span style="width:28px;height:2px;background:#7b1fa2;display:inline-block"></span> Average
         </div>
       </div>
       <div style="display:flex;gap:6px">
@@ -654,49 +654,26 @@ function lastNMonths(n) {
 
 // FX
 async function loadFX() {
-  document.getElementById('fx-bar').innerHTML = '<span style="color:var(--ink-3);font-style:italic">⟳ Loading live rates...</span>';
-
-  function fetchWithTimeout(url, ms) {
-    return Promise.race([
-      fetch(url),
-      new Promise(function(_, reject){ setTimeout(function(){ reject(new Error('timeout')); }, ms); })
-    ]);
-  }
-
   try {
-    var r = await fetchWithTimeout('https://open.er-api.com/v6/latest/SGD', 8000);
-    if (r.ok) {
-      var d = await r.json();
-      if (d.rates && d.rates.AUD) { fxRates = d.rates; fxRates.SGD = 1; renderFXBar(); renderAll(); return; }
-    }
-  } catch(e) {}
-
-  try {
-    var r2 = await fetchWithTimeout('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/sgd.json', 8000);
-    if (r2.ok) {
+    var r = await fetch('https://api.exchangerate-api.com/v4/latest/SGD');
+    var d = await r.json();
+    fxRates = d.rates; fxRates.SGD = 1;
+    renderFXBar(); renderAll();
+  } catch(e) {
+    // Fallback to open.er-api
+    try {
+      var r2 = await fetch('https://open.er-api.com/v6/latest/SGD');
       var d2 = await r2.json();
-      if (d2.sgd && d2.sgd.aud) {
-        fxRates = { SGD:1 };
-        var map = { AUD:'aud', THB:'thb', GBP:'gbp', USD:'usd' };
-        Object.keys(map).forEach(function(k){ if(d2.sgd[map[k]]) fxRates[k] = d2.sgd[map[k]]; });
-        renderFXBar(); renderAll(); return;
-      }
+      fxRates = d2.rates; fxRates.SGD = 1;
+      renderFXBar(); renderAll();
+    } catch(e2) {
+      fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:1.71, USD:1.35 };
+      document.getElementById('fx-bar').innerHTML =
+        '<span style="color:var(--gold)">⚠ Using approximate rates</span>' +
+        ' <button onclick="loadFX()" style="background:var(--ink);color:#fff;border:none;border-radius:4px;padding:3px 10px;font-size:.72rem;cursor:pointer;font-family:sans-serif">&#8635; Retry</button>';
+      renderAll();
     }
-  } catch(e) {}
-
-  try {
-    var r3 = await fetchWithTimeout('https://api.exchangerate-api.com/v4/latest/SGD', 8000);
-    if (r3.ok) {
-      var d3 = await r3.json();
-      if (d3.rates && d3.rates.AUD) { fxRates = d3.rates; fxRates.SGD = 1; renderFXBar(); renderAll(); return; }
-    }
-  } catch(e) {}
-
-  fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:1.71, USD:1.35 };
-  document.getElementById('fx-bar').innerHTML =
-    '<span style="color:var(--gold)">⚠ Using approximate rates (live unavailable)</span>' +
-    ' <button onclick="loadFX()" style="background:var(--ink);color:#fff;border:none;border-radius:4px;padding:3px 10px;font-size:.72rem;cursor:pointer;font-family:sans-serif">&#8635; Retry</button>';
-  renderAll();
+  }
 }
 
 function renderFXBar() {
@@ -1109,8 +1086,8 @@ function renderSpendingChart() {
     data: {
       labels: labels,
       datasets: [
-        { type:'bar',  label:'Budgeted',  data:budgeted, backgroundColor:'rgba(176,58,46,0.25)', borderColor:'rgba(176,58,46,0.9)', borderWidth:1.5, borderRadius:4, order:3 },
-        { type:'bar',  label:'Actual',    data:actuals,  backgroundColor:barClr[cur].bg, borderColor:barClr[cur].bd, borderWidth:1.5, borderRadius:4, order:4 },
+        { type:'bar',  label:'Actual',    data:actuals,  backgroundColor:barClr[cur].bg, borderColor:barClr[cur].bd, borderWidth:1.5, borderRadius:4, order:2 },
+        { type:'bar',  label:'Budgeted',  data:budgeted, backgroundColor:'rgba(176,58,46,0.25)', borderColor:'rgba(176,58,46,0.85)', borderWidth:1.5, borderRadius:4, order:2 },
         { type:'line', label:'Average',   data:avgLine,  borderColor:'#7b1fa2', borderWidth:2.5, pointRadius:0, fill:false, order:1 }
       ]
     },
