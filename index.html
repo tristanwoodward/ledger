@@ -876,8 +876,7 @@ function renderSpendingChart() {
 
   var months = lastNMonths(summaryFilter);
   var labels = months.map(mShort);
-  var fxMap  = { SGD:1, AUD:fxRates.AUD||1.12, THB:fxRates.THB||27.5 };
-  var barClr = { SGD:{bg:'rgba(45,122,79,0.22)',bd:'rgba(45,122,79,0.8)'}, AUD:{bg:'rgba(184,134,11,0.22)',bd:'rgba(184,134,11,0.8)'}, THB:{bg:'rgba(37,99,168,0.22)',bd:'rgba(37,99,168,0.8)'} };
+  var fxMap  = { SGD:1, AUD:fxRates.AUD||1.12, THB:fxRates.THB||27.5 };  var barClr = { SGD:{bg:'rgba(45,122,79,0.22)',bd:'rgba(45,122,79,0.8)'}, AUD:{bg:'rgba(184,134,11,0.22)',bd:'rgba(184,134,11,0.8)'}, THB:{bg:'rgba(37,99,168,0.22)',bd:'rgba(37,99,168,0.8)'} };
   var tClr   = { SGD:'#2d7a4f', AUD:'#b8860b', THB:'#2563a8' };
   var tPfx   = { SGD:'S$', AUD:'A$', THB:'฿' };
   var cur = chartCur;
@@ -887,7 +886,10 @@ function renderSpendingChart() {
     if (!md || !md.actual) return null;
     var mfx = getMonthFX(m);
     var sgd = md.actual.cur==='SGD' ? md.actual.amt : md.actual.amt/(mfx[md.actual.cur]||1);
-    return sgd * (fxMap[cur]||1);
+    if (cur==='SGD') return sgd;
+    if (cur==='AUD') return sgd * (mfx.AUD||fxRates.AUD||1.12);
+    if (cur==='THB') return sgd * (mfx.THB||fxRates.THB||27.5);
+    return sgd;
   });
 
   var budgeted = months.map(function(m) {
@@ -895,7 +897,10 @@ function renderSpendingChart() {
     if (!md || !md.items.length) return null;
     var mfx = getMonthFX(m);
     var sgd = md.items.reduce(function(s,i){ return s+(i.cur==='SGD'?i.amt:i.amt/(mfx[i.cur]||1)); }, 0);
-    return sgd * (fxMap[cur]||1);
+    if (cur==='SGD') return sgd;
+    if (cur==='AUD') return sgd * (mfx.AUD||fxRates.AUD||1.12);
+    if (cur==='THB') return sgd * (mfx.THB||fxRates.THB||27.5);
+    return sgd;
   });
 
   // Trend line
