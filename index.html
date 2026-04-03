@@ -263,7 +263,29 @@ tr:hover td { background: var(--paper); }
     <div class="stat-card blue"><div class="stat-label">Total Budgeted</div><div class="stat-value blue mono" id="bud-total">S$0</div></div>
     <div class="stat-card red"><div class="stat-label">Actual Spent</div><div class="stat-value mono" id="bud-actual" style="color:var(--ink-3)">—</div></div>
     <div class="stat-card green"><div class="stat-label">Variance</div><div class="stat-value mono" id="bud-variance" style="color:var(--ink-3)">—</div></div>
-    <div class="stat-card gold"><div class="stat-label">Avg Monthly Spend <span id="avg-filter-label" style="font-weight:400;text-transform:none;letter-spacing:0">(6M)</span></div><div class="stat-value gold mono" id="bud-avg-spend">—</div><div class="stat-change" id="bud-avg-spend-aud"></div></div>
+    <div class="stat-card gold">
+      <div class="stat-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Avg Monthly Spend</span>
+        <select id="avg-cur-select" onchange="renderSummary()" style="font-size:.68rem;padding:2px 6px;border-radius:4px;border:1px solid var(--paper-3);background:var(--paper);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink-2)">
+          <option value="SGD">S$</option>
+          <option value="AUD">A$</option>
+          <option value="THB">฿</option>
+        </select>
+      </div>
+      <div class="stat-value gold mono" id="bud-avg-spend">—</div>
+      <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+        <button class="avg-filter-btn active" onclick="setAvgFilter(1,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:var(--ink);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">1M</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(3,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">3M</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(6,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">6M</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(12,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">1Y</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(24,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">2Y</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(36,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">3Y</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(48,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">4Y</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(60,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">5Y</button>
+        <button class="avg-filter-btn" onclick="setAvgFilter(72,this)" style="font-size:.65rem;padding:2px 7px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">6Y</button>
+      </div>
+      <div class="stat-change" id="bud-avg-spend-aud" style="margin-top:4px"></div>
+    </div>
   </div>
 
   <div class="month-nav">
@@ -314,10 +336,10 @@ tr:hover td { background: var(--paper); }
         </div>
       </div>
       <div class="fx-override-grid">
-        <div class="form-group"><label>1 AUD = ? SGD</label><input id="fx-aud" type="number" step="0.0001" placeholder="e.g. 0.8900"></div>
-        <div class="form-group"><label>1 THB = ? SGD</label><input id="fx-thb" type="number" step="0.0001" placeholder="e.g. 0.0364"></div>
-        <div class="form-group"><label>1 GBP = ? SGD</label><input id="fx-gbp" type="number" step="0.0001" placeholder="e.g. 1.7100"></div>
-        <div class="form-group"><label>1 USD = ? SGD</label><input id="fx-usd" type="number" step="0.0001" placeholder="e.g. 1.3500"></div>
+        <div class="form-group"><label>1 AUD = ? SGD</label><input id="fx-aud" type="number" step="0.000001" placeholder="e.g. 0.8900"></div>
+        <div class="form-group"><label>1 THB = ? SGD</label><input id="fx-thb" type="number" step="0.000001" placeholder="e.g. 0.0364"></div>
+        <div class="form-group"><label>1 GBP = ? SGD</label><input id="fx-gbp" type="number" step="0.000001" placeholder="e.g. 1.7100"></div>
+        <div class="form-group"><label>1 USD = ? SGD</label><input id="fx-usd" type="number" step="0.000001" placeholder="e.g. 1.3500"></div>
       </div>
     </div>
 
@@ -521,6 +543,20 @@ var state = {
 };
 var fxRates = { SGD:1, AUD:1, THB:1, GBP:1, USD:1 };
 var summaryFilter = 6;
+var avgFilter = 1;
+
+function setAvgFilter(n, btn) {
+  avgFilter = n;
+  document.querySelectorAll('.avg-filter-btn').forEach(function(b){
+    b.style.background = 'none';
+    b.style.color = 'var(--ink-3)';
+    b.style.borderColor = 'var(--paper-3)';
+  });
+  btn.style.background = 'var(--ink)';
+  btn.style.color = '#fff';
+  btn.style.borderColor = 'var(--ink)';
+  renderSummary();
+}
 var chartCur = 'SGD';
 var charts = {};
 
@@ -785,10 +821,6 @@ function setSummaryFilter(n, btn) {
   summaryFilter = n;
   document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  // Update average label
-  var label = n===1?'1M':n===12?'1Y':n>=24?(n/12)+'Y':n+'M';
-  var el = document.getElementById('avg-filter-label');
-  if (el) el.textContent = '(' + label + ')';
   renderSummary(); renderSpendingChart();
 }
 
@@ -797,24 +829,31 @@ function renderSummary() {
   var tbl = document.getElementById('summary-table');
   var hasAny = months.some(function(m){ return state.budgetMonths[m] && (state.budgetMonths[m].items.length || state.budgetMonths[m].actual); });
 
-  // Compute average monthly spend for the period
-  var actualValues = months.map(function(m) {
+  // Compute average monthly spend using avgFilter (independent of summary table filter)
+  var avgCurSel = document.getElementById('avg-cur-select');
+  var avgCur = avgCurSel ? avgCurSel.value : 'SGD';
+  var avgMonths = lastNMonths(avgFilter);
+
+  var actualValues = avgMonths.map(function(m) {
     var md = state.budgetMonths[m];
     if (!md || !md.actual) return null;
     var mfx = getMonthFX(m);
-    return md.actual.cur==='SGD' ? md.actual.amt : md.actual.amt/(mfx[md.actual.cur]||1);
+    var sgd = md.actual.cur==='SGD' ? md.actual.amt : md.actual.amt/(mfx[md.actual.cur]||1);
+    if (avgCur === 'AUD') return sgd * (mfx.AUD||fxRates.AUD||1.12);
+    if (avgCur === 'THB') return sgd * (mfx.THB||fxRates.THB||27.5);
+    return sgd;
   }).filter(function(v){ return v !== null; });
 
-  var avgSGD = actualValues.length ? actualValues.reduce(function(s,v){return s+v;},0) / actualValues.length : null;
+  var avgVal = actualValues.length ? actualValues.reduce(function(s,v){return s+v;},0) / actualValues.length : null;
   var avgCard = document.getElementById('bud-avg-spend');
-  var avgAudCard = document.getElementById('bud-avg-spend-aud');
-  if (avgSGD !== null && avgCard) {
-    avgCard.textContent = fmtSGD(avgSGD);
-    var audAvg = avgSGD * (fxRates.AUD || 1.12);
-    if (avgAudCard) avgAudCard.textContent = 'A$' + Math.round(audAvg).toLocaleString('en-US') + ' · ' + actualValues.length + ' months of data';
+  var avgSub  = document.getElementById('bud-avg-spend-aud');
+  if (avgVal !== null && avgCard) {
+    var avgPrefix = avgCur==='THB' ? '฿' : avgCur==='AUD' ? 'A$' : 'S$';
+    avgCard.textContent = avgPrefix + Math.round(avgVal).toLocaleString('en-US');
+    if (avgSub) avgSub.textContent = actualValues.length + ' months of data';
   } else {
     if (avgCard) avgCard.textContent = '—';
-    if (avgAudCard) avgAudCard.textContent = 'No actuals in this period';
+    if (avgSub) avgSub.textContent = 'No actuals in this period';
   }
 
   var hdrs = months.map(function(m){ return '<th>' + mShort(m) + '</th>'; }).join('');
