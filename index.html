@@ -202,16 +202,18 @@ tr:hover td { background: var(--paper); }
 <!-- NET WORTH -->
 <div class="page" id="page-networth">
   <div class="section-title">Net Worth</div>
-  <div class="section-sub">Month-end snapshots across all accounts — converted to SGD.</div>
+  <div class="section-sub">Month-end snapshots — detailed account breakdown or lump sum.</div>
 
-  <!-- Month nav -->
   <div class="month-nav">
     <button onclick="changeNWMonth(-1)">&#8592;</button>
     <div class="month-label" id="nw-month-label"></div>
     <button onclick="changeNWMonth(1)">&#8594;</button>
+    <div style="display:flex;gap:4px;margin-left:1rem">
+      <button id="nw-mode-detailed" onclick="setNWMode('detailed')" style="font-size:.78rem;padding:5px 14px;border-radius:100px;border:none;background:var(--ink);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">Detailed</button>
+      <button id="nw-mode-lump" onclick="setNWMode('lump')" style="font-size:.78rem;padding:5px 14px;border-radius:100px;border:1px solid var(--paper-3);background:none;color:var(--ink-3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">Lump Sum</button>
+    </div>
   </div>
 
-  <!-- Stat cards -->
   <div class="stat-grid">
     <div class="stat-card green"><div class="stat-label">Personal Net Worth (SGD)</div><div class="stat-value green mono" id="nw-total">S$0</div></div>
     <div class="stat-card gold"><div class="stat-label">Personal Net Worth (AUD)</div><div class="stat-value gold mono" id="nw-total-aud">A$0</div></div>
@@ -219,97 +221,106 @@ tr:hover td { background: var(--paper); }
     <div class="stat-card gold"><div class="stat-label">Investments (SGD)</div><div class="stat-value gold mono" id="nw-inv-total">S$0</div><div class="stat-change" id="nw-inv-pct"></div></div>
   </div>
 
-  <!-- Main layout -->
-  <div class="two-col">
-
-    <!-- Left: Personal + Business accounts -->
-    <div>
+  <!-- LUMP SUM MODE -->
+  <div id="nw-lump-section" style="display:none">
+    <div class="two-col">
       <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
-          <div class="card-title" style="margin-bottom:0">Personal Assets</div>
-          <button class="btn btn-sm" onclick="document.getElementById('nw-add-form').style.display=document.getElementById('nw-add-form').style.display==='none'?'block':'none'">+ Add Account</button>
-        </div>
-        <div id="nw-add-form" style="display:none;margin-bottom:1rem;padding:1rem;background:var(--paper);border-radius:var(--radius-sm)">
-          <div class="form-grid">
-            <div class="form-group"><label>Account Name</label><input id="nw-acc-name" placeholder="e.g. IBKR Brokerage"></div>
-            <div class="form-group"><label>Type</label>
-              <select id="nw-acc-type">
-                <option value="Cash">Cash</option>
-                <option value="Investment">Investment</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Section</label>
-              <select id="nw-acc-cat">
-                <option value="Personal">Personal</option>
-                <option value="Business">Business</option>
-              </select>
-            </div>
-            <div class="form-group"><label>Currency</label>
-              <select id="nw-acc-cur"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
-            </div>
-            <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addNWAccount()">Add</button></div>
+        <div class="card-title">Monthly Total</div>
+        <div style="font-size:.8rem;color:var(--ink-3);margin-bottom:1rem">Enter your total net worth for this month as a single figure.</div>
+        <div class="form-grid" style="margin-bottom:1rem">
+          <div class="form-group"><label>Currency</label>
+            <select id="nw-lump-cur"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
           </div>
-          <div style="font-size:.73rem;color:var(--ink-3);margin-top:.5rem">Accounts carry forward each month automatically — just update the values.</div>
-        </div>
-
-        <!-- Personal accounts -->
-        <div class="bud-col-header" style="grid-template-columns:2fr 0.8fr 1fr 1fr 36px">
-          <span>Account</span><span>Ccy</span><span>Value</span><span>SGD</span><span></span>
-        </div>
-        <div id="nw-personal-list"></div>
-        <div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 36px;gap:.75rem;padding:10px 0 0 0;border-top:2px solid var(--ink);margin-top:6px">
-          <span style="font-weight:700;font-size:.875rem">Personal Total</span><span></span><span></span>
-          <span class="mono col-sgd" id="nw-personal-total" style="font-weight:700">S$0</span><span></span>
-        </div>
-
-        <!-- Business accounts -->
-        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px dashed var(--paper-3)">
-          <div style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem">Business Cash <span style="font-weight:400;color:var(--ink-3)">(excluded from net worth)</span></div>
-          <div id="nw-business-list"></div>
-          <div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 36px;gap:.75rem;padding:10px 0 0 0;border-top:1px solid var(--paper-3);margin-top:6px">
-            <span style="font-weight:600;font-size:.875rem;color:var(--red)">Business Total</span><span></span><span></span>
-            <span class="mono text-red" id="nw-business-total" style="font-weight:600">S$0</span><span></span>
+          <div class="form-group"><label>Total Amount</label>
+            <input id="nw-lump-amt" type="number" placeholder="0" style="font-family:'DM Mono',monospace">
           </div>
+          <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="saveNWLump()">Save</button></div>
+        </div>
+        <div id="nw-lump-saved" style="display:none;padding:.75rem;background:var(--green-light);border-radius:var(--radius-sm)">
+          <div style="font-size:.85rem;color:var(--green);font-weight:600" id="nw-lump-display"></div>
+          <button class="btn-ghost" onclick="editNWLump()" style="margin-top:.5rem;font-size:.75rem">Edit</button>
         </div>
       </div>
-    </div>
-
-    <!-- Right: Allocation donut + FX + MoM -->
-    <div>
-      <!-- Allocation donut -->
-      <div class="card">
-        <div class="card-title">Cash vs Investments</div>
-        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
-          <div style="position:relative;width:130px;height:130px;flex-shrink:0"><canvas id="allocChart"></canvas></div>
-          <div id="alloc-legend" style="flex:1"></div>
-        </div>
-      </div>
-
-      <!-- FX override -->
-      <div class="card">
-        <div class="card-title">FX Rates for this Month</div>
-        <div style="font-size:.78rem;margin-bottom:.75rem" id="nw-fx-status">Using working rates</div>
-        <div class="fx-override-grid">
-          <div class="form-group"><label>1 AUD = ? SGD</label><input id="nw-fx-aud" type="number" step="0.000001" placeholder="e.g. 0.8900"></div>
-          <div class="form-group"><label>1 THB = ? SGD</label><input id="nw-fx-thb" type="number" step="0.000001" placeholder="e.g. 0.0400"></div>
-          <div class="form-group"><label>1 GBP = ? SGD</label><input id="nw-fx-gbp" type="number" step="0.000001" placeholder="e.g. 1.7100"></div>
-          <div class="form-group"><label>1 USD = ? SGD</label><input id="nw-fx-usd" type="number" step="0.000001" placeholder="e.g. 1.3500"></div>
-        </div>
-        <div style="display:flex;gap:.5rem;margin-top:.75rem">
-          <button class="btn btn-sm" onclick="saveNWFX()">Lock Rates</button>
-          <button class="btn-ghost btn-sm" id="nw-fx-clear-btn" onclick="clearNWFX()" style="display:none">Clear</button>
-        </div>
-      </div>
-
-      <!-- MoM change -->
       <div class="card">
         <div class="card-title">Month on Month Change</div>
-        <div id="nw-mom-change"></div>
+        <div id="nw-mom-change-lump"></div>
       </div>
     </div>
   </div>
 
-  <!-- Net Worth Chart -->
+  <!-- DETAILED MODE -->
+  <div id="nw-detailed-section">
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+            <div class="card-title" style="margin-bottom:0">Personal Assets</div>
+            <button class="btn btn-sm" onclick="document.getElementById('nw-add-form').style.display=document.getElementById('nw-add-form').style.display==='none'?'block':'none'">+ Add Account</button>
+          </div>
+          <div id="nw-add-form" style="display:none;margin-bottom:1rem;padding:1rem;background:var(--paper);border-radius:var(--radius-sm)">
+            <div class="form-grid">
+              <div class="form-group"><label>Account Name</label><input id="nw-acc-name" placeholder="e.g. IBKR Brokerage"></div>
+              <div class="form-group"><label>Type</label>
+                <select id="nw-acc-type"><option value="Cash">Cash</option><option value="Investment">Investment</option></select>
+              </div>
+              <div class="form-group"><label>Section</label>
+                <select id="nw-acc-cat"><option value="Personal">Personal</option><option value="Business">Business</option></select>
+              </div>
+              <div class="form-group"><label>Currency</label>
+                <select id="nw-acc-cur"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
+              </div>
+              <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addNWAccount()">Add</button></div>
+            </div>
+            <div style="font-size:.73rem;color:var(--ink-3);margin-top:.5rem">Accounts carry forward each month — just update the values.</div>
+          </div>
+          <div class="bud-col-header" style="grid-template-columns:2fr 0.8fr 1fr 1fr 36px">
+            <span>Account</span><span>Ccy</span><span>Value</span><span>SGD</span><span></span>
+          </div>
+          <div id="nw-personal-list"></div>
+          <div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 36px;gap:.75rem;padding:10px 0 0 0;border-top:2px solid var(--ink);margin-top:6px">
+            <span style="font-weight:700;font-size:.875rem">Personal Total</span><span></span><span></span>
+            <span class="mono col-sgd" id="nw-personal-total" style="font-weight:700">S$0</span><span></span>
+          </div>
+          <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px dashed var(--paper-3)">
+            <div style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem">Business Cash <span style="font-weight:400;color:var(--ink-3)">(excluded from net worth)</span></div>
+            <div id="nw-business-list"></div>
+            <div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 36px;gap:.75rem;padding:10px 0 0 0;border-top:1px solid var(--paper-3);margin-top:6px">
+              <span style="font-weight:600;font-size:.875rem;color:var(--red)">Business Total</span><span></span><span></span>
+              <span class="mono text-red" id="nw-business-total" style="font-weight:600">S$0</span><span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">Cash vs Investments</div>
+          <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+            <div style="position:relative;width:130px;height:130px;flex-shrink:0"><canvas id="allocChart"></canvas></div>
+            <div id="alloc-legend" style="flex:1"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">FX Rates for this Month</div>
+          <div style="font-size:.78rem;margin-bottom:.75rem" id="nw-fx-status">Using working rates</div>
+          <div class="fx-override-grid">
+            <div class="form-group"><label>1 AUD = ? SGD</label><input id="nw-fx-aud" type="number" step="0.000001" placeholder="e.g. 0.8900"></div>
+            <div class="form-group"><label>1 THB = ? SGD</label><input id="nw-fx-thb" type="number" step="0.000001" placeholder="e.g. 0.0400"></div>
+            <div class="form-group"><label>1 GBP = ? SGD</label><input id="nw-fx-gbp" type="number" step="0.000001" placeholder="e.g. 1.7100"></div>
+            <div class="form-group"><label>1 USD = ? SGD</label><input id="nw-fx-usd" type="number" step="0.000001" placeholder="e.g. 1.3500"></div>
+          </div>
+          <div style="display:flex;gap:.5rem;margin-top:.75rem">
+            <button class="btn btn-sm" onclick="saveNWFX()">Lock Rates</button>
+            <button class="btn-ghost btn-sm" id="nw-fx-clear-btn" onclick="clearNWFX()" style="display:none">Clear</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Month on Month Change</div>
+          <div id="nw-mom-change"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
       <div class="card-title" style="margin-bottom:0">Net Worth Over Time</div>
@@ -1192,6 +1203,66 @@ function getNWFX(m) {
   return fxRates;
 }
 
+function setNWMode(mode) {
+  // Save mode per month
+  var md = getNWM(nwMonth);
+  md.mode = mode;
+  saveState();
+  applyNWMode(mode);
+}
+
+function applyNWMode(mode) {
+  var detailed = document.getElementById('nw-detailed-section');
+  var lump     = document.getElementById('nw-lump-section');
+  var btnD     = document.getElementById('nw-mode-detailed');
+  var btnL     = document.getElementById('nw-mode-lump');
+  if (!detailed || !lump) return;
+  if (mode === 'lump') {
+    detailed.style.display = 'none';
+    lump.style.display = 'block';
+    if (btnD) { btnD.style.background='none'; btnD.style.color='var(--ink-3)'; btnD.style.border='1px solid var(--paper-3)'; }
+    if (btnL) { btnL.style.background='var(--ink)'; btnL.style.color='#fff'; btnL.style.border='none'; }
+  } else {
+    detailed.style.display = 'block';
+    lump.style.display = 'none';
+    if (btnD) { btnD.style.background='var(--ink)'; btnD.style.color='#fff'; btnD.style.border='none'; }
+    if (btnL) { btnL.style.background='none'; btnL.style.color='var(--ink-3)'; btnL.style.border='1px solid var(--paper-3)'; }
+  }
+}
+
+function saveNWLump() {
+  var cur = document.getElementById('nw-lump-cur').value;
+  var amt = parseFloat(document.getElementById('nw-lump-amt').value) || 0;
+  if (!amt) return;
+  var md = getNWM(nwMonth);
+  md.lump = { cur:cur, amt:amt };
+  saveState(); renderNetWorth();
+}
+
+function editNWLump() {
+  var md = getNWM(nwMonth);
+  md.lump = null;
+  document.getElementById('nw-lump-amt').value = '';
+  saveState(); renderNetWorth();
+}
+
+function getNWTotal(m) {
+  // Returns { sgd, mode } for a given month — works for both lump and detailed
+  var md = state.nwMonths && state.nwMonths[m];
+  if (!md) return null;
+  var mfx = getNWFX(m);
+  function cvt(amt, cur) { return cur==='SGD'?amt:amt/(mfx[cur]||1); }
+  if (md.mode === 'lump' && md.lump) {
+    return { sgd: cvt(md.lump.amt, md.lump.cur), mode:'lump' };
+  }
+  if (md.accounts && md.accounts.length) {
+    var total = md.accounts.filter(function(a){ return a.cat!=='Business'; })
+      .reduce(function(s,a){ return s+cvt(a.val,a.cur); }, 0);
+    return total > 0 ? { sgd:total, mode:'detailed' } : null;
+  }
+  return null;
+}
+
 function changeNWMonth(dir) {
   nwMonth = dir > 0 ? nextMonth(nwMonth) : prevMonth(nwMonth);
   var prev = prevMonth(nwMonth);
@@ -1268,6 +1339,64 @@ function setNWChartCur(cur) {
 function renderNetWorth() {
   if (!state.nwMonths) state.nwMonths = {};
   var m = nwMonth;
+  var md = getNWM(m);
+  var mfx = getNWFX(m);
+
+  // Default mode: lump for pre-2024, detailed for 2024+
+  if (!md.mode) md.mode = m < '2024-01' ? 'lump' : 'detailed';
+  applyNWMode(md.mode);
+
+  // Handle lump sum mode display
+  if (md.mode === 'lump') {
+    var lumpEl = document.getElementById('nw-lump-saved');
+    var lumpInput = document.getElementById('nw-lump-amt');
+    var lumpDisp = document.getElementById('nw-lump-display');
+    if (md.lump) {
+      var lumpSGD = md.lump.cur==='SGD' ? md.lump.amt : md.lump.amt/(mfx[md.lump.cur]||1);
+      if (lumpEl) lumpEl.style.display = 'block';
+      if (lumpInput) lumpInput.style.display = 'none';
+      if (lumpDisp) lumpDisp.textContent = fmtCur(md.lump.amt,md.lump.cur) + ' = ' + fmtSGD(lumpSGD);
+      // Update stat cards
+      document.getElementById('nw-total').textContent = fmtSGD(lumpSGD);
+      var lumpAUD = lumpSGD * (mfx.AUD||fxRates.AUD||1.12);
+      document.getElementById('nw-total-aud').textContent = 'A$' + Math.round(lumpAUD).toLocaleString('en-US');
+      document.getElementById('nw-cash-total').textContent = '—';
+      document.getElementById('nw-cash-pct').textContent = 'Use detailed mode for breakdown';
+      document.getElementById('nw-inv-total').textContent = '—';
+      document.getElementById('nw-inv-pct').textContent = '';
+    } else {
+      if (lumpEl) lumpEl.style.display = 'none';
+      var lumpCurEl = document.getElementById('nw-lump-cur');
+      if (lumpCurEl && m < '2024-01') lumpCurEl.value = 'AUD';
+      document.getElementById('nw-total').textContent = '—';
+      document.getElementById('nw-total-aud').textContent = '—';
+      document.getElementById('nw-cash-total').textContent = '—';
+      document.getElementById('nw-cash-pct').textContent = '';
+      document.getElementById('nw-inv-total').textContent = '—';
+      document.getElementById('nw-inv-pct').textContent = '';
+    }
+    // MoM for lump
+    var prev = prevMonth(m);
+    var prevTotal = getNWTotal(prev);
+    var curTotal = getNWTotal(m);
+    var momEl = document.getElementById('nw-mom-change-lump');
+    if (momEl && prevTotal && curTotal) {
+      var change = curTotal.sgd - prevTotal.sgd;
+      var pct = prevTotal.sgd>0?(change/prevTotal.sgd)*100:0;
+      var pos = change>=0;
+      momEl.innerHTML = '<div style="display:flex;gap:1.5rem;flex-wrap:wrap">' +
+        '<div><div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:4px">vs '+mLabel(prev)+'</div>' +
+        '<div class="mono" style="font-size:1.3rem;font-weight:600;color:'+(pos?'var(--green)':'var(--red)')+'">'+( pos?'+':'-')+fmtSGD(Math.abs(change))+'</div></div>' +
+        '<div><div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:4px">Change</div>' +
+        '<div style="font-size:1.3rem;font-weight:700;color:'+(pos?'var(--green)':'var(--red)')+'">'+( pos?'▲':'▼')+' '+Math.abs(pct).toFixed(1)+'%</div></div></div>';
+    } else if (momEl) {
+      momEl.innerHTML = '<div style="color:var(--ink-3);font-size:.85rem">No previous month data yet.</div>';
+    }
+    document.getElementById('nw-month-label').textContent = mLabel(m);
+    renderNWChart('nwChart2');
+    return;
+  }
+
   var md = getNWM(m);
   var mfx = getNWFX(m);
   function cvt(amt, cur) { return cur==='SGD'?amt:amt/(mfx[cur]||1); }
@@ -1420,12 +1549,9 @@ function renderNWChart(id) {
   var dotClr  = cur==='AUD'?'#b8860b':'#2d7a4f';
 
   var dataPoints = months.map(function(m) {
-    var md = state.nwMonths[m];
-    var mfx = getNWFX(m);
-    var personal = md.accounts.filter(function(a){ return a.cat!=='Business'; })
-      .reduce(function(s,a){ return s+(a.cur==='SGD'?a.val:a.val/(mfx[a.cur]||1)); }, 0);
-    if (personal===0) return null;
-    return cur==='AUD' ? personal*(mfx.AUD||fxRates.AUD||1.12) : personal;
+    var total = getNWTotal(m);
+    if (!total || !total.sgd) return null;
+    return cur==='AUD' ? total.sgd*(getNWFX(m).AUD||fxRates.AUD||1.12) : total.sgd;
   });
 
   var hasData = dataPoints.some(function(v){ return v!==null; });
