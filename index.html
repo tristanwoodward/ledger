@@ -1243,6 +1243,11 @@ function editNWLump() {
   var md = getNWM(nwMonth);
   md.lump = null;
   document.getElementById('nw-lump-amt').value = '';
+  document.getElementById('nw-lump-amt').style.display = '';
+  document.getElementById('nw-lump-cur').style.display = '';
+  var saveBtn = document.querySelector('#nw-lump-section .btn');
+  if (saveBtn) saveBtn.style.display = '';
+  document.getElementById('nw-lump-saved').style.display = 'none';
   saveState(); renderNetWorth();
 }
 
@@ -1355,6 +1360,8 @@ function renderNetWorth() {
       var lumpSGD = md.lump.cur==='SGD' ? md.lump.amt : md.lump.amt/(mfx[md.lump.cur]||1);
       if (lumpEl) lumpEl.style.display = 'block';
       if (lumpInput) lumpInput.style.display = 'none';
+      if (document.getElementById('nw-lump-cur')) document.getElementById('nw-lump-cur').style.display = 'none';
+      if (document.querySelector('#nw-lump-section .btn')) document.querySelector('#nw-lump-section .btn').style.display = 'none';
       if (lumpDisp) lumpDisp.textContent = fmtCur(md.lump.amt,md.lump.cur) + ' = ' + fmtSGD(lumpSGD);
       // Update stat cards
       document.getElementById('nw-total').textContent = fmtSGD(lumpSGD);
