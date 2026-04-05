@@ -594,7 +594,7 @@ var state = {
   budgetMonths: {},
   currentBudgetMonth: new Date().toISOString().slice(0,7)
 };
-var fxRates = { SGD:1, AUD:1, THB:1, GBP:1, USD:1 };
+var fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:0.585, USD:0.74 };
 var summaryFilter = 6;
 var avgFilter = 1;
 
@@ -1040,8 +1040,7 @@ function renderSummary() {
 // SPENDING CHART
 function setChartCur(cur) {
   chartCur = cur;
-  var clrs  = { SGD:'rgba(45,122,79,0.85)', AUD:'rgba(184,134,11,0.85)', THB:'rgba(37,99,168,0.85)' };
-  var bords = { SGD:'rgba(45,122,79,0.4)', AUD:'rgba(184,134,11,0.4)', THB:'rgba(37,99,168,0.4)' };
+  var clrs = { SGD:'rgba(45,122,79,0.85)', AUD:'rgba(184,134,11,0.85)', THB:'rgba(37,99,168,0.85)' };
   ['SGD','AUD','THB'].forEach(function(c) {
     var btn = document.getElementById('toggle-' + c.toLowerCase());
     if (!btn) return;
@@ -1049,15 +1048,12 @@ function setChartCur(cur) {
     btn.style.color = c===cur ? '#fff' : (c==='SGD'?'var(--green)':c==='AUD'?'#b8860b':'var(--blue)');
     btn.style.border = c===cur ? 'none' : '2px solid ' + (c==='SGD'?'var(--green)':c==='AUD'?'#b8860b':'var(--blue)');
   });
-  // Update legend line
-  var leg = document.getElementById('trend-line-legend');
-  var avgLeg = document.getElementById('avg-line-legend');
   var actualLeg = document.getElementById('actual-bar-legend');
-  if (leg) leg.style.background = '#7b1fa2';
-  if (avgLeg) avgLeg.style.background = '#7b1fa2';
   var bgMap = { SGD:'rgba(45,122,79,0.22)', AUD:'rgba(184,134,11,0.22)', THB:'rgba(37,99,168,0.22)' };
   var bdMap = { SGD:'rgba(45,122,79,0.8)', AUD:'rgba(184,134,11,0.8)', THB:'rgba(37,99,168,0.8)' };
   if (actualLeg) { actualLeg.style.background = bgMap[cur]; actualLeg.style.borderColor = bdMap[cur]; }
+  // Force destroy existing chart before redraw
+  if (charts.spending) { charts.spending.destroy(); charts.spending = null; }
   renderSpendingChart();
 }
 
