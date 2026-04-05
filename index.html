@@ -202,7 +202,7 @@ tr:hover td { background: var(--paper); }
 <!-- NET WORTH -->
 <div class="page" id="page-networth">
   <div class="section-title">Net Worth</div>
-  <div class="section-sub">Monthly snapshots across all accounts — personal net worth excludes business accounts.</div>
+  <div class="section-sub">Month-end snapshots across all accounts — converted to SGD.</div>
 
   <!-- Month nav -->
   <div class="month-nav">
@@ -215,52 +215,83 @@ tr:hover td { background: var(--paper); }
   <div class="stat-grid">
     <div class="stat-card green"><div class="stat-label">Personal Net Worth (SGD)</div><div class="stat-value green mono" id="nw-total">S$0</div></div>
     <div class="stat-card gold"><div class="stat-label">Personal Net Worth (AUD)</div><div class="stat-value gold mono" id="nw-total-aud">A$0</div></div>
-    <div class="stat-card blue"><div class="stat-label">Total Assets (SGD)</div><div class="stat-value blue mono" id="nw-assets">S$0</div></div>
-    <div class="stat-card red"><div class="stat-label">Business Cash (SGD)</div><div class="stat-value red mono" id="nw-business">S$0</div><div class="stat-change">Excluded from net worth</div></div>
+    <div class="stat-card blue"><div class="stat-label">Cash (SGD)</div><div class="stat-value blue mono" id="nw-cash-total">S$0</div><div class="stat-change" id="nw-cash-pct"></div></div>
+    <div class="stat-card gold"><div class="stat-label">Investments (SGD)</div><div class="stat-value gold mono" id="nw-inv-total">S$0</div><div class="stat-change" id="nw-inv-pct"></div></div>
   </div>
 
+  <!-- Main layout -->
   <div class="two-col">
-    <!-- Accounts -->
-    <div class="card">
-      <div class="card-title">Assets</div>
 
-      <!-- Add account (only shown if no accounts exist yet) -->
-      <div id="nw-add-account-form">
-        <div class="form-grid" style="margin-bottom:1rem">
-          <div class="form-group"><label>Account Name</label><input id="nw-acc-name" placeholder="e.g. IBKR Brokerage"></div>
-          <div class="form-group"><label>Category</label>
-            <select id="nw-acc-cat">
-              <option value="Personal">Personal</option>
-              <option value="Business">Business</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Currency</label>
-            <select id="nw-acc-cur"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
-          </div>
-          <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addNWAccount()">+ Add Account</button></div>
+    <!-- Left: Personal + Business accounts -->
+    <div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+          <div class="card-title" style="margin-bottom:0">Personal Assets</div>
+          <button class="btn btn-sm" onclick="document.getElementById('nw-add-form').style.display=document.getElementById('nw-add-form').style.display==='none'?'block':'none'">+ Add Account</button>
         </div>
-        <div style="font-size:.75rem;color:var(--ink-3);margin-bottom:1rem">Add your accounts once — they'll carry forward each month automatically.</div>
-      </div>
+        <div id="nw-add-form" style="display:none;margin-bottom:1rem;padding:1rem;background:var(--paper);border-radius:var(--radius-sm)">
+          <div class="form-grid">
+            <div class="form-group"><label>Account Name</label><input id="nw-acc-name" placeholder="e.g. IBKR Brokerage"></div>
+            <div class="form-group"><label>Type</label>
+              <select id="nw-acc-type">
+                <option value="Cash">Cash</option>
+                <option value="Investment">Investment</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Section</label>
+              <select id="nw-acc-cat">
+                <option value="Personal">Personal</option>
+                <option value="Business">Business</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Currency</label>
+              <select id="nw-acc-cur"><option>SGD</option><option>AUD</option><option>THB</option><option>GBP</option><option>USD</option></select>
+            </div>
+            <div class="form-group"><label>&nbsp;</label><button class="btn" onclick="addNWAccount()">Add</button></div>
+          </div>
+          <div style="font-size:.73rem;color:var(--ink-3);margin-top:.5rem">Accounts carry forward each month automatically — just update the values.</div>
+        </div>
 
-      <!-- Account list with editable values -->
-      <div class="bud-col-header" style="grid-template-columns:2fr 1fr 1fr 1fr 36px">
-        <span>Account</span><span>Currency</span><span>Value</span><span>SGD</span><span></span>
-      </div>
-      <div id="nw-account-list"></div>
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 36px;gap:.75rem;padding:12px 0 0 0;border-top:2px solid var(--ink);margin-top:8px">
-        <span style="font-weight:700">Total Personal (SGD)</span><span></span><span></span>
-        <span class="mono col-sgd" id="nw-personal-total" style="font-weight:700">S$0</span><span></span>
+        <!-- Personal accounts -->
+        <div class="bud-col-header" style="grid-template-columns:2fr 0.8fr 1fr 1fr 36px">
+          <span>Account</span><span>Ccy</span><span>Value</span><span>SGD</span><span></span>
+        </div>
+        <div id="nw-personal-list"></div>
+        <div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 36px;gap:.75rem;padding:10px 0 0 0;border-top:2px solid var(--ink);margin-top:6px">
+          <span style="font-weight:700;font-size:.875rem">Personal Total</span><span></span><span></span>
+          <span class="mono col-sgd" id="nw-personal-total" style="font-weight:700">S$0</span><span></span>
+        </div>
+
+        <!-- Business accounts -->
+        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px dashed var(--paper-3)">
+          <div style="font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem">Business Cash <span style="font-weight:400;color:var(--ink-3)">(excluded from net worth)</span></div>
+          <div id="nw-business-list"></div>
+          <div style="display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 36px;gap:.75rem;padding:10px 0 0 0;border-top:1px solid var(--paper-3);margin-top:6px">
+            <span style="font-weight:600;font-size:.875rem;color:var(--red)">Business Total</span><span></span><span></span>
+            <span class="mono text-red" id="nw-business-total" style="font-weight:600">S$0</span><span></span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- FX + MoM change -->
+    <!-- Right: Allocation donut + FX + MoM -->
     <div>
+      <!-- Allocation donut -->
+      <div class="card">
+        <div class="card-title">Cash vs Investments</div>
+        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">
+          <div style="position:relative;width:130px;height:130px;flex-shrink:0"><canvas id="allocChart"></canvas></div>
+          <div id="alloc-legend" style="flex:1"></div>
+        </div>
+      </div>
+
+      <!-- FX override -->
       <div class="card">
         <div class="card-title">FX Rates for this Month</div>
-        <div style="font-size:.78rem;color:var(--ink-3);margin-bottom:.75rem" id="nw-fx-status">Using live rates — lock historical rates below</div>
+        <div style="font-size:.78rem;margin-bottom:.75rem" id="nw-fx-status">Using working rates</div>
         <div class="fx-override-grid">
           <div class="form-group"><label>1 AUD = ? SGD</label><input id="nw-fx-aud" type="number" step="0.000001" placeholder="e.g. 0.8900"></div>
-          <div class="form-group"><label>1 THB = ? SGD</label><input id="nw-fx-thb" type="number" step="0.000001" placeholder="e.g. 0.0364"></div>
+          <div class="form-group"><label>1 THB = ? SGD</label><input id="nw-fx-thb" type="number" step="0.000001" placeholder="e.g. 0.0400"></div>
           <div class="form-group"><label>1 GBP = ? SGD</label><input id="nw-fx-gbp" type="number" step="0.000001" placeholder="e.g. 1.7100"></div>
           <div class="form-group"><label>1 USD = ? SGD</label><input id="nw-fx-usd" type="number" step="0.000001" placeholder="e.g. 1.3500"></div>
         </div>
@@ -269,6 +300,8 @@ tr:hover td { background: var(--paper); }
           <button class="btn-ghost btn-sm" id="nw-fx-clear-btn" onclick="clearNWFX()" style="display:none">Clear</button>
         </div>
       </div>
+
+      <!-- MoM change -->
       <div class="card">
         <div class="card-title">Month on Month Change</div>
         <div id="nw-mom-change"></div>
@@ -285,7 +318,7 @@ tr:hover td { background: var(--paper); }
         <button id="nw-toggle-aud" onclick="setNWChartCur('AUD')" style="background:none;color:#b8860b;border:2px solid #b8860b;border-radius:100px;padding:5px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">A$</button>
       </div>
     </div>
-    <div style="height:280px;position:relative"><canvas id="nwChart2"></canvas></div>
+    <div style="height:300px;position:relative"><canvas id="nwChart2"></canvas></div>
   </div>
 </div>
 
@@ -1161,7 +1194,7 @@ function changeNWMonth(dir) {
     var cur = getNWM(nwMonth);
     if (!cur.accounts.length) {
       cur.accounts = state.nwMonths[prev].accounts.map(function(a) {
-        return { id:Date.now()+Math.random(), name:a.name, cat:a.cat, cur:a.cur, val:a.val };
+        return { id:Date.now()+Math.random(), name:a.name, cat:a.cat, type:a.type||'Cash', cur:a.cur, val:a.val };
       });
       saveState();
     }
@@ -1172,15 +1205,17 @@ function changeNWMonth(dir) {
 function addNWAccount() {
   var name = document.getElementById('nw-acc-name').value.trim();
   var cat  = document.getElementById('nw-acc-cat').value;
+  var type = document.getElementById('nw-acc-type').value;
   var cur  = document.getElementById('nw-acc-cur').value;
   if (!name) return;
   if (!state.nwMonths) state.nwMonths = {};
-  var newAcc = { name:name, cat:cat, cur:cur, val:0 };
+  var newAcc = { name:name, cat:cat, type:type, cur:cur, val:0 };
   getNWM(nwMonth).accounts.push(Object.assign({id:Date.now()}, newAcc));
   Object.keys(state.nwMonths).forEach(function(m) {
     if (m !== nwMonth) state.nwMonths[m].accounts.push(Object.assign({id:Date.now()+Math.random()}, newAcc));
   });
   document.getElementById('nw-acc-name').value = '';
+  document.getElementById('nw-add-form').style.display = 'none';
   saveState(); renderNetWorth();
 }
 
@@ -1221,6 +1256,7 @@ function setNWChartCur(cur) {
     btn.style.color = c===cur ? '#fff' : (c==='SGD'?'var(--green)':'#b8860b');
     btn.style.border = c===cur ? 'none' : '2px solid ' + (c==='SGD'?'var(--green)':'#b8860b');
   });
+  if (charts.nwChart2) { charts.nwChart2.destroy(); charts.nwChart2 = null; }
   renderNWChart('nwChart2');
 }
 
@@ -1233,91 +1269,136 @@ function renderNetWorth() {
 
   var personalAccs = md.accounts.filter(function(a){ return a.cat !== 'Business'; });
   var businessAccs = md.accounts.filter(function(a){ return a.cat === 'Business'; });
+  var cashAccs     = personalAccs.filter(function(a){ return (a.type||'Cash') !== 'Investment'; });
+  var invAccs      = personalAccs.filter(function(a){ return (a.type||'Cash') === 'Investment'; });
+
   var totalPersonal = personalAccs.reduce(function(s,a){ return s+cvt(a.val,a.cur); }, 0);
   var totalBusiness = businessAccs.reduce(function(s,a){ return s+cvt(a.val,a.cur); }, 0);
-  var totalAUD = totalPersonal * (mfx.AUD||fxRates.AUD||1.12);
+  var totalCash     = cashAccs.reduce(function(s,a){ return s+cvt(a.val,a.cur); }, 0);
+  var totalInv      = invAccs.reduce(function(s,a){ return s+cvt(a.val,a.cur); }, 0);
+  var totalAUD      = totalPersonal * (mfx.AUD||fxRates.AUD||1.12);
+  var cashPct       = totalPersonal > 0 ? Math.round(totalCash/totalPersonal*100) : 0;
+  var invPct        = totalPersonal > 0 ? Math.round(totalInv/totalPersonal*100) : 0;
 
   document.getElementById('nw-month-label').textContent = mLabel(m);
   document.getElementById('nw-total').textContent = fmtSGD(totalPersonal);
-  document.getElementById('nw-total-aud').textContent = 'A' + String.fromCharCode(36) + Math.round(totalAUD).toLocaleString('en-US');
-  document.getElementById('nw-assets').textContent = fmtSGD(totalPersonal);
-  document.getElementById('nw-business').textContent = fmtSGD(totalBusiness);
+  document.getElementById('nw-total-aud').textContent = 'A$' + Math.round(totalAUD).toLocaleString('en-US');
+  document.getElementById('nw-cash-total').textContent = fmtSGD(totalCash);
+  document.getElementById('nw-cash-pct').textContent = cashPct + '% of personal NW';
+  document.getElementById('nw-inv-total').textContent = fmtSGD(totalInv);
+  document.getElementById('nw-inv-pct').textContent = invPct + '% of personal NW';
   document.getElementById('nw-personal-total').textContent = fmtSGD(totalPersonal);
+  document.getElementById('nw-business-total').textContent = fmtSGD(totalBusiness);
 
-  var list = document.getElementById('nw-account-list');
-  if (!md.accounts.length) {
-    list.innerHTML = '<div class="empty" style="padding:1.5rem"><div class="empty-icon">&#127974;</div>Add your accounts above.</div>';
-  } else {
-    var rows = '';
-    md.accounts.forEach(function(acc) {
+  function renderAccList(el, accs) {
+    if (!accs.length) {
+      el.innerHTML = '<div style="color:var(--ink-3);font-size:.85rem;padding:.5rem 0">None added yet.</div>';
+      return;
+    }
+    el.innerHTML = '';
+    accs.forEach(function(acc) {
       var sgd = cvt(acc.val, acc.cur);
       var isBiz = acc.cat === 'Business';
+      var isInv = (acc.type||'Cash') === 'Investment';
       var row = document.createElement('div');
-      row.style.cssText = 'display:grid;grid-template-columns:2fr 1fr 1fr 1fr 36px;gap:.75rem;align-items:center;padding:9px 0;border-bottom:1px solid var(--paper-2)';
+      row.style.cssText = 'display:grid;grid-template-columns:2fr 0.8fr 1fr 1fr 36px;gap:.75rem;align-items:center;padding:9px 0;border-bottom:1px solid var(--paper-2)';
       var nameDiv = document.createElement('div');
-      nameDiv.innerHTML = '<div style="font-weight:500;font-size:.875rem">'+acc.name+'</div><div style="font-size:.7rem;color:'+(isBiz?'var(--red)':'var(--ink-3)')+'">'+acc.cat+(isBiz?' · excluded':'')+'</div>';
+      nameDiv.innerHTML = '<div style="font-weight:500;font-size:.875rem">'+acc.name+'</div>' +
+        '<div style="font-size:.68rem;color:'+(isInv?'var(--gold)':'var(--blue)')+'">'+( isInv?'Investment':'Cash')+'</div>';
       var curSpan = document.createElement('span');
-      curSpan.className = 'mono'; curSpan.style.cssText = 'font-size:.8rem;color:var(--ink-3)';
+      curSpan.className='mono'; curSpan.style.cssText='font-size:.8rem;color:var(--ink-3)';
       curSpan.textContent = acc.cur;
       var input = document.createElement('input');
-      input.type = 'number'; input.value = acc.val;
-      input.style.cssText = 'font-size:.85rem;padding:5px 8px;border:1px solid var(--paper-3);border-radius:4px;background:var(--paper);width:100%';
-      (function(mm, aid) { input.onchange = function(){ updateNWValue(mm, aid, this.value); }; })(m, acc.id);
+      input.type='number'; input.value=acc.val;
+      input.style.cssText='font-size:.85rem;padding:5px 8px;border:1px solid var(--paper-3);border-radius:4px;background:var(--paper);width:100%';
+      (function(mm,aid){ input.onchange=function(){ updateNWValue(mm,aid,this.value); }; })(m,acc.id);
       var sgdSpan = document.createElement('span');
-      sgdSpan.className = 'mono ' + (isBiz?'text-red':'col-sgd');
-      sgdSpan.style.fontSize = '.82rem'; sgdSpan.textContent = fmtSGD(sgd);
+      sgdSpan.className='mono '+(isBiz?'text-red':'col-sgd');
+      sgdSpan.style.fontSize='.82rem'; sgdSpan.textContent=fmtSGD(sgd);
       var delBtn = document.createElement('button');
-      delBtn.className = 'btn-ghost'; delBtn.style.cssText = 'padding:3px 8px;font-size:.75rem';
-      delBtn.textContent = 'X';
-      (function(aname) { delBtn.onclick = function(){ removeNWAccount(aname); }; })(acc.name);
+      delBtn.className='btn-ghost'; delBtn.style.cssText='padding:3px 8px;font-size:.75rem';
+      delBtn.textContent='✕';
+      (function(aname){ delBtn.onclick=function(){ removeNWAccount(aname); }; })(acc.name);
       row.appendChild(nameDiv); row.appendChild(curSpan); row.appendChild(input);
       row.appendChild(sgdSpan); row.appendChild(delBtn);
-      list.appendChild(row);
+      el.appendChild(row);
     });
   }
 
+  renderAccList(document.getElementById('nw-personal-list'), personalAccs);
+  renderAccList(document.getElementById('nw-business-list'), businessAccs);
+
+  // Allocation donut
+  renderAllocChart(totalCash, totalInv);
+
+  // FX UI
   var clearBtn = document.getElementById('nw-fx-clear-btn');
   var status = document.getElementById('nw-fx-status');
   if (md.fx) {
-    document.getElementById('nw-fx-aud').value = md.fx.AUD ? (1/md.fx.AUD).toFixed(6) : '';
+    document.getElementById('nw-fx-aud').value = md.fx.AUD ? (1/md.fx.AUD).toFixed(4) : '';
     document.getElementById('nw-fx-thb').value = md.fx.THB ? (1/md.fx.THB).toFixed(6) : '';
-    document.getElementById('nw-fx-gbp').value = md.fx.GBP ? (1/md.fx.GBP).toFixed(6) : '';
-    document.getElementById('nw-fx-usd').value = md.fx.USD ? (1/md.fx.USD).toFixed(6) : '';
+    document.getElementById('nw-fx-gbp').value = md.fx.GBP ? (1/md.fx.GBP).toFixed(4) : '';
+    document.getElementById('nw-fx-usd').value = md.fx.USD ? (1/md.fx.USD).toFixed(4) : '';
     clearBtn.style.display = 'inline-block';
     status.textContent = 'Locked historical rates for this month';
     status.style.color = 'var(--gold)';
   } else {
-    ['aud','thb','gbp','usd'].forEach(function(c) { document.getElementById('nw-fx-'+c).value = ''; });
-    document.getElementById('nw-fx-aud').placeholder = fxRates.AUD ? (1/fxRates.AUD).toFixed(4) : '';
-    document.getElementById('nw-fx-thb').placeholder = fxRates.THB ? (1/fxRates.THB).toFixed(6) : '';
-    document.getElementById('nw-fx-gbp').placeholder = fxRates.GBP ? (1/fxRates.GBP).toFixed(4) : '';
-    document.getElementById('nw-fx-usd').placeholder = fxRates.USD ? (1/fxRates.USD).toFixed(4) : '';
+    ['aud','thb','gbp','usd'].forEach(function(c){ document.getElementById('nw-fx-'+c).value=''; });
+    document.getElementById('nw-fx-aud').placeholder = fxRates.AUD?(1/fxRates.AUD).toFixed(4):'';
+    document.getElementById('nw-fx-thb').placeholder = fxRates.THB?(1/fxRates.THB).toFixed(6):'';
+    document.getElementById('nw-fx-gbp').placeholder = fxRates.GBP?(1/fxRates.GBP).toFixed(4):'';
+    document.getElementById('nw-fx-usd').placeholder = fxRates.USD?(1/fxRates.USD).toFixed(4):'';
     clearBtn.style.display = 'none';
-    status.textContent = 'Using live rates — lock historical rates below';
+    status.textContent = 'Using working rates — lock historical rates below';
     status.style.color = 'var(--ink-3)';
   }
 
+  // MoM change
   var prev = prevMonth(m);
   var prevMD = state.nwMonths && state.nwMonths[prev];
   var momEl = document.getElementById('nw-mom-change');
   if (prevMD && prevMD.accounts.length) {
     var prevFX = getNWFX(prev);
-    var prevPersonal = prevMD.accounts.filter(function(a){ return a.cat !== 'Business'; })
+    var prevPersonal = prevMD.accounts.filter(function(a){ return a.cat!=='Business'; })
       .reduce(function(s,a){ return s+(a.cur==='SGD'?a.val:a.val/(prevFX[a.cur]||1)); }, 0);
     var change = totalPersonal - prevPersonal;
-    var pct = prevPersonal > 0 ? (change/prevPersonal)*100 : 0;
-    var pos = change >= 0;
+    var pct = prevPersonal>0?(change/prevPersonal)*100:0;
+    var pos = change>=0;
     momEl.innerHTML = '<div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap">' +
       '<div><div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:4px">vs '+mLabel(prev)+'</div>' +
       '<div class="mono" style="font-size:1.3rem;font-weight:600;color:'+(pos?'var(--green)':'var(--red)')+'">'+( pos?'+':'-')+fmtSGD(Math.abs(change))+'</div></div>' +
-      '<div><div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:4px">Change %</div>' +
-      '<div style="font-size:1.3rem;font-weight:700;color:'+(pos?'var(--green)':'var(--red)')+'">'+( pos?'up':'down')+' '+Math.abs(pct).toFixed(1)+'%</div></div>' +
+      '<div><div style="font-size:.7rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:4px">Change</div>' +
+      '<div style="font-size:1.3rem;font-weight:700;color:'+(pos?'var(--green)':'var(--red)')+'">'+( pos?'▲':'▼')+' '+Math.abs(pct).toFixed(1)+'%</div></div>' +
       '</div>';
   } else {
     momEl.innerHTML = '<div style="color:var(--ink-3);font-size:.85rem">No previous month data yet.</div>';
   }
 
   renderNWChart('nwChart2');
+}
+
+function renderAllocChart(cash, inv) {
+  var canvas = document.getElementById('allocChart');
+  if (!canvas) return;
+  if (charts.alloc) { charts.alloc.destroy(); }
+  var total = cash + inv;
+  var leg = document.getElementById('alloc-legend');
+  if (total === 0) {
+    if (leg) leg.innerHTML = '<div style="color:var(--ink-3);font-size:.85rem">No data yet.</div>';
+    return;
+  }
+  var cashPct = Math.round(cash/total*100);
+  var invPct  = Math.round(inv/total*100);
+  if (leg) leg.innerHTML =
+    '<div style="margin-bottom:.75rem"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="width:12px;height:12px;border-radius:50%;background:#2563a8;display:inline-block"></span><span style="font-size:.8rem;font-weight:600">Cash</span></div>' +
+    '<div class="mono" style="font-size:1rem;color:var(--blue)">' + fmtSGD(cash) + '</div><div style="font-size:.75rem;color:var(--ink-3)">' + cashPct + '% of personal NW</div></div>' +
+    '<div><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="width:12px;height:12px;border-radius:50%;background:#c8923a;display:inline-block"></span><span style="font-size:.8rem;font-weight:600">Investments</span></div>' +
+    '<div class="mono" style="font-size:1rem;color:var(--gold)">' + fmtSGD(inv) + '</div><div style="font-size:.75rem;color:var(--ink-3)">' + invPct + '% of personal NW</div></div>';
+  charts.alloc = new Chart(canvas, {
+    type: 'doughnut',
+    data: { labels:['Cash','Investments'], datasets:[{ data:[cash,inv], backgroundColor:['#2563a8','#c8923a'], borderWidth:0, hoverOffset:4 }] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'70%', plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:function(ctx){ return ctx.label+': '+fmtSGD(ctx.raw)+' ('+Math.round(ctx.raw/total*100)+'%)'; } } } } }
+  });
 }
 
 // NW CHART
@@ -1327,26 +1408,33 @@ function renderNWChart(id) {
   if (!state.nwMonths || !Object.keys(state.nwMonths).length) { renderNWChartEmpty(canvas); return; }
 
   var months = Object.keys(state.nwMonths).sort();
-  var cur = (id === 'nwChart2') ? nwChartCur : 'SGD';
-  var pfx = cur === 'AUD' ? 'A$' : 'S$';
-  var lineClr = cur === 'AUD' ? '#b8860b' : '#2d7a4f';
-  var fillClr = cur === 'AUD' ? 'rgba(184,134,11,0.08)' : 'rgba(45,122,79,0.08)';
+  var cur = (id==='nwChart2') ? nwChartCur : 'SGD';
+  var pfx = cur==='AUD'?'A$':'S$';
+  var lineClr = cur==='AUD'?'#b8860b':'#2d7a4f';
+  var fillClr = cur==='AUD'?'rgba(184,134,11,0.08)':'rgba(45,122,79,0.08)';
+  var dotClr  = cur==='AUD'?'#b8860b':'#2d7a4f';
 
   var dataPoints = months.map(function(m) {
     var md = state.nwMonths[m];
     var mfx = getNWFX(m);
-    var personal = md.accounts.filter(function(a){ return a.cat !== 'Business'; })
+    var personal = md.accounts.filter(function(a){ return a.cat!=='Business'; })
       .reduce(function(s,a){ return s+(a.cur==='SGD'?a.val:a.val/(mfx[a.cur]||1)); }, 0);
-    if (personal === 0) return null;
-    return cur === 'AUD' ? personal*(mfx.AUD||fxRates.AUD||1.12) : personal;
+    if (personal===0) return null;
+    return cur==='AUD' ? personal*(mfx.AUD||fxRates.AUD||1.12) : personal;
   });
 
-  var hasData = dataPoints.some(function(v){ return v !== null; });
+  var hasData = dataPoints.some(function(v){ return v!==null; });
   if (!hasData) { renderNWChartEmpty(canvas); return; }
 
   charts[id] = new Chart(canvas, {
     type:'line',
-    data:{ labels:months.map(mShort), datasets:[{ data:dataPoints, borderColor:lineClr, backgroundColor:fillClr, fill:true, tension:0.4, pointBackgroundColor:lineClr, pointRadius:4, borderWidth:2.5, spanGaps:true }]},
+    data:{ labels:months.map(mShort), datasets:[{
+      data:dataPoints, borderColor:lineClr, backgroundColor:fillClr,
+      fill:true, tension:0.3,
+      pointBackgroundColor:dotClr, pointBorderColor:'#fff', pointBorderWidth:2,
+      pointRadius:5, pointHoverRadius:7,
+      borderWidth:2.5, spanGaps:true
+    }]},
     options:{ responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(ctx){ return ctx.raw!==null?pfx+Math.round(ctx.raw).toLocaleString('en-US'):''; }}}},
       scales:{
@@ -1358,7 +1446,7 @@ function renderNWChart(id) {
 }
 
 function renderNWChartEmpty(canvas) {
-  var ctx = canvas.getContext('2d');
+  var ctx=canvas.getContext('2d');
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle='#8891a8'; ctx.font='13px DM Sans'; ctx.textAlign='center';
   ctx.fillText('Add monthly snapshots to see your net worth trend.',canvas.width/2,140);
@@ -1636,6 +1724,11 @@ function renderDashboard() {
 loadState();
 if (!state.dividends) state.dividends = [];
 if (!state.nwMonths) state.nwMonths = {};
+// Always default to current month/year on load
+var _now = new Date().toISOString().slice(0,7);
+state.currentBudgetMonth = _now;
+nwMonth = _now;
+incomeYear = new Date().getFullYear();
 loadManualFX();
 document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('inc-date').value = new Date().toISOString().slice(0,10);
