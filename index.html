@@ -292,9 +292,25 @@ tr:hover td { background: var(--paper); }
 <!-- BUDGET -->
 <div class="page" id="page-budget">
   <div class="section-title">Budget / Expenses</div>
-  <div class="section-sub">Monthly itemised forecast with live currency conversion.</div>
+  <div class="section-sub">Monthly itemised forecast with manual currency rates.</div>
 
-  <div class="fx-bar" id="fx-bar"><span style="color:var(--ink-3);font-style:italic">Loading live rates...</span> <button onclick="loadFX()" style="background:none;border:1px solid var(--paper-3);border-radius:4px;padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--ink-3);font-family:'DM Sans',sans-serif">Refresh</button></div>
+  <!-- Manual FX Rates Panel -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:.75rem">
+      <div>
+        <div class="card-title" style="margin-bottom:0">Working Exchange Rates</div>
+        <div style="font-size:.75rem;color:var(--ink-3);margin-top:2px" id="fx-last-updated">Not set — enter your current rates below</div>
+      </div>
+      <button class="btn btn-sm" onclick="saveManualFX()">Save Rates</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem">
+      <div class="form-group"><label>1 AUD = ? SGD</label><input id="manual-fx-aud" type="number" step="0.000001" placeholder="e.g. 0.8900"></div>
+      <div class="form-group"><label>1 THB = ? SGD</label><input id="manual-fx-thb" type="number" step="0.000001" placeholder="e.g. 0.0400"></div>
+      <div class="form-group"><label>1 GBP = ? SGD</label><input id="manual-fx-gbp" type="number" step="0.000001" placeholder="e.g. 1.7100"></div>
+      <div class="form-group"><label>1 USD = ? SGD</label><input id="manual-fx-usd" type="number" step="0.000001" placeholder="e.g. 1.3500"></div>
+    </div>
+    <div style="margin-top:.75rem;font-size:.75rem;color:var(--ink-3)">These are your working rates for display — use the per-month FX override below to lock historical rates for accuracy.</div>
+  </div>
 
   <div class="stat-grid">
     <div class="stat-card blue"><div class="stat-label">Total Budgeted</div><div class="stat-value blue mono" id="bud-total">S$0</div></div>
@@ -653,42 +669,40 @@ function lastNMonths(n) {
 }
 
 // FX
-async function loadFX() {
-  try {
-    var r = await fetch('https://open.er-api.com/v6/latest/SGD');
-    var d = await r.json();
-    if (d.result === 'success' && d.rates && d.rates.AUD) {
-      fxRates = d.rates; fxRates.SGD = 1;
-      renderFXBar(); renderAll(); return;
-    }
-  } catch(e) {}
-  try {
-    var r2 = await fetch('https://api.exchangerate-api.com/v4/latest/SGD');
-    var d2 = await r2.json();
-    if (d2.rates && d2.rates.AUD) {
-      fxRates = d2.rates; fxRates.SGD = 1;
-      renderFXBar(); renderAll(); return;
-    }
-  } catch(e2) {}
-  // Accurate fallback rates as of early 2026 (SGD base: X units of foreign per 1 SGD)
-  fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:0.585, USD:0.74 };
-  document.getElementById('fx-bar').innerHTML =
-    '<span style="color:var(--gold)">⚠ Using approximate rates — </span>' +
-    '<button onclick="loadFX()" style="background:var(--ink);color:#fff;border:none;border-radius:4px;padding:3px 10px;font-size:.72rem;cursor:pointer;font-family:sans-serif">&#8635; Retry</button>';
+function saveManualFX() {
+  var aud = parseFloat(document.getElementById('manual-fx-aud').value);
+  var thb = parseFloat(document.getElementById('manual-fx-thb').value);
+  var gbp = parseFloat(document.getElementById('manual-fx-gbp').value);
+  var usd = parseFloat(document.getElementById('manual-fx-usd').value);
+  if (!aud && !thb && !gbp && !usd) return;
+  // Store as "units of foreign per 1 SGD" to match API format
+  if (aud) fxRates.AUD = 1/aud;
+  if (thb) fxRates.THB = 1/thb;
+  if (gbp) fxRates.GBP = 1/gbp;
+  if (usd) fxRates.USD = 1/usd;
+  var now = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+  state.manualFX = { AUD: fxRates.AUD, THB: fxRates.THB, GBP: fxRates.GBP, USD: fxRates.USD, updated: now };
+  localStorage.setItem('ledger_v2', JSON.stringify(state));
+  document.getElementById('fx-last-updated').textContent = 'Last updated: ' + now;
   renderAll();
 }
 
-function renderFXBar() {
-  var pairs = ['AUD','THB','GBP','USD'];
-  var html = '<span class="fx-dot"></span><strong style="color:var(--ink-2);font-size:.8rem">Live Rates</strong>';
-  for (var i=0; i<pairs.length; i++) {
-    var c = pairs[i], rate = fxRates[c] ? (1/fxRates[c]) : 0;
-    html += '<span>1 SGD = <span class="fx-rate">' + rate.toFixed(c==='THB'?2:4) + ' ' + c + '</span></span>';
-    if (i < pairs.length-1) html += '<span style="color:var(--paper-3);padding:0 4px">|</span>';
+function loadManualFX() {
+  if (state.manualFX) {
+    fxRates = { SGD:1, AUD: state.manualFX.AUD||1.12, THB: state.manualFX.THB||27.5, GBP: state.manualFX.GBP||0.585, USD: state.manualFX.USD||0.74 };
+    // Populate fields
+    if (state.manualFX.AUD) document.getElementById('manual-fx-aud').value = (1/state.manualFX.AUD).toFixed(6);
+    if (state.manualFX.THB) document.getElementById('manual-fx-thb').value = (1/state.manualFX.THB).toFixed(6);
+    if (state.manualFX.GBP) document.getElementById('manual-fx-gbp').value = (1/state.manualFX.GBP).toFixed(6);
+    if (state.manualFX.USD) document.getElementById('manual-fx-usd').value = (1/state.manualFX.USD).toFixed(6);
+    var el = document.getElementById('fx-last-updated');
+    if (el) el.textContent = 'Last updated: ' + (state.manualFX.updated || 'unknown');
+  } else {
+    // Sensible defaults (Apr 2026 approximate)
+    fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:0.585, USD:0.74 };
   }
-  html += '<button onclick="loadFX()" style="background:none;border:1px solid var(--paper-3);border-radius:4px;padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--ink-3);font-family:\'DM Sans\',sans-serif;margin-left:auto">↺ Refresh</button>';
-  document.getElementById('fx-bar').innerHTML = html;
 }
+
 
 // NAVIGATION
 function showPage(id, btn) {
@@ -1609,12 +1623,12 @@ function renderDashboard() {
 loadState();
 if (!state.dividends) state.dividends = [];
 if (!state.nwMonths) state.nwMonths = {};
+loadManualFX();
 document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('inc-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
 document.getElementById('trend-line-legend') && (document.getElementById('trend-line-legend').style.background = '#7b1fa2');
 renderAll();
-loadFX();
 </script>
 </body>
 </html>
