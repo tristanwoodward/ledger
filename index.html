@@ -669,38 +669,56 @@ function lastNMonths(n) {
 }
 
 // FX
+async function loadFX() {
+  try {
+    var r = await fetch('https://api.exchangerate-api.com/v4/latest/SGD');
+    var d = await r.json();
+    fxRates = d.rates;
+    fxRates.SGD = 1;
+    renderFXRates();
+    renderAll();
+  } catch(e) {
+    renderAll();
+  }
+}
+
 function saveManualFX() {
   var aud = parseFloat(document.getElementById('manual-fx-aud').value);
   var thb = parseFloat(document.getElementById('manual-fx-thb').value);
   var gbp = parseFloat(document.getElementById('manual-fx-gbp').value);
   var usd = parseFloat(document.getElementById('manual-fx-usd').value);
-  if (!aud && !thb && !gbp && !usd) return;
-  // Store as "units of foreign per 1 SGD" to match API format
   if (aud) fxRates.AUD = 1/aud;
   if (thb) fxRates.THB = 1/thb;
   if (gbp) fxRates.GBP = 1/gbp;
   if (usd) fxRates.USD = 1/usd;
-  var now = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
-  state.manualFX = { AUD: fxRates.AUD, THB: fxRates.THB, GBP: fxRates.GBP, USD: fxRates.USD, updated: now };
-  localStorage.setItem('ledger_v2', JSON.stringify(state));
-  document.getElementById('fx-last-updated').textContent = 'Last updated: ' + now;
+  var now = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  state.manualFX = { AUD:fxRates.AUD, THB:fxRates.THB, GBP:fxRates.GBP, USD:fxRates.USD, updated:now };
+  saveState();
+  document.getElementById('fx-last-updated').textContent = 'Manually set: ' + now;
   renderAll();
 }
 
 function loadManualFX() {
   if (state.manualFX) {
-    fxRates = { SGD:1, AUD: state.manualFX.AUD||1.12, THB: state.manualFX.THB||27.5, GBP: state.manualFX.GBP||0.585, USD: state.manualFX.USD||0.74 };
-    // Populate fields
-    if (state.manualFX.AUD) document.getElementById('manual-fx-aud').value = (1/state.manualFX.AUD).toFixed(6);
+    fxRates = { SGD:1, AUD:state.manualFX.AUD||1.12, THB:state.manualFX.THB||27.5, GBP:state.manualFX.GBP||0.585, USD:state.manualFX.USD||0.74 };
+    if (state.manualFX.AUD) document.getElementById('manual-fx-aud').value = (1/state.manualFX.AUD).toFixed(4);
     if (state.manualFX.THB) document.getElementById('manual-fx-thb').value = (1/state.manualFX.THB).toFixed(6);
-    if (state.manualFX.GBP) document.getElementById('manual-fx-gbp').value = (1/state.manualFX.GBP).toFixed(6);
-    if (state.manualFX.USD) document.getElementById('manual-fx-usd').value = (1/state.manualFX.USD).toFixed(6);
+    if (state.manualFX.GBP) document.getElementById('manual-fx-gbp').value = (1/state.manualFX.GBP).toFixed(4);
+    if (state.manualFX.USD) document.getElementById('manual-fx-usd').value = (1/state.manualFX.USD).toFixed(4);
     var el = document.getElementById('fx-last-updated');
-    if (el) el.textContent = 'Last updated: ' + (state.manualFX.updated || 'unknown');
+    if (el) el.textContent = 'Manually set: ' + (state.manualFX.updated||'');
   } else {
-    // Sensible defaults (Apr 2026 approximate)
     fxRates = { SGD:1, AUD:1.12, THB:27.5, GBP:0.585, USD:0.74 };
   }
+}
+
+function renderFXRates() {
+  var el = document.getElementById('fx-last-updated');
+  if (!el) return;
+  var pairs = ['AUD','THB','GBP','USD'];
+  var parts = pairs.map(function(c){ return '1 SGD = ' + (fxRates[c]?(1/fxRates[c]).toFixed(c==='THB'?2:4):'-') + ' ' + c; });
+  el.textContent = 'Live rates loaded — ' + parts.join(' · ');
+  el.style.color = 'var(--green)';
 }
 
 
@@ -1627,8 +1645,8 @@ loadManualFX();
 document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('inc-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
-document.getElementById('trend-line-legend') && (document.getElementById('trend-line-legend').style.background = '#7b1fa2');
 renderAll();
+loadFX(); // attempt live rates — will silently fail and use manual rates if unavailable
 </script>
 </body>
 </html>
