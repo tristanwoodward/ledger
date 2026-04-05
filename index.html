@@ -1182,8 +1182,13 @@ function getNWM(m) {
 }
 
 function getNWFX(m) {
-  var md = state.nwMonths && state.nwMonths[m];
-  if (md && md.fx) return md.fx;
+  // 1. Use Net Worth tab's own locked rates if set
+  var nwMD = state.nwMonths && state.nwMonths[m];
+  if (nwMD && nwMD.fx) return nwMD.fx;
+  // 2. Fall back to Budget tab's locked rates for the same month
+  var budMD = state.budgetMonths && state.budgetMonths[m];
+  if (budMD && budMD.fx) return budMD.fx;
+  // 3. Fall back to global working rates
   return fxRates;
 }
 
