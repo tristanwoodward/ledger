@@ -1057,8 +1057,7 @@ function setChartCur(cur) {
   if (avgLeg) avgLeg.style.background = '#7b1fa2';
   var bgMap = { SGD:'rgba(45,122,79,0.22)', AUD:'rgba(184,134,11,0.22)', THB:'rgba(37,99,168,0.22)' };
   var bdMap = { SGD:'rgba(45,122,79,0.8)', AUD:'rgba(184,134,11,0.8)', THB:'rgba(37,99,168,0.8)' };
-  if (actualLeg) { actualLeg.style.background = bgMap[cur]; actualLeg.style.borderColor = bdMap[cur]; }ackground = lineCol;
-  if (avgLeg) avgLeg.style.borderTopColor = lineCol;
+  if (actualLeg) { actualLeg.style.background = bgMap[cur]; actualLeg.style.borderColor = bdMap[cur]; }
   renderSpendingChart();
 }
 
