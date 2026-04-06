@@ -207,7 +207,7 @@ tr:hover td { background: var(--paper); }
 
   <div class="month-nav">
     <button onclick="changeNWMonth(-1)">&#8592;</button>
-    <div class="month-label" id="nw-month-label"></div>
+    <div class="month-label" id="nw-month-label" onclick="openMonthPicker('nw')" style="cursor:pointer;position:relative" title="Click to jump to any month"></div>
     <button onclick="changeNWMonth(1)">&#8594;</button>
     <div style="display:flex;gap:4px;margin-left:1rem">
       <button id="nw-mode-detailed" onclick="setNWMode('detailed')" style="font-size:.78rem;padding:5px 14px;border-radius:100px;border:none;background:var(--ink);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">Detailed</button>
@@ -388,7 +388,7 @@ tr:hover td { background: var(--paper); }
 
   <div class="month-nav">
     <button onclick="changeMonth(-1)">&#8592;</button>
-    <div class="month-label" id="budget-month-label"></div>
+    <div class="month-label" id="budget-month-label" onclick="openMonthPicker('budget')" style="cursor:pointer" title="Click to jump to any month"></div>
     <button onclick="changeMonth(1)">&#8594;</button>
   </div>
 
@@ -1372,7 +1372,7 @@ function changeNWMonth(dir) {
     var cur = getNWM(nwMonth);
     if (!cur.accounts.length) {
       cur.accounts = state.nwMonths[prev].accounts.map(function(a) {
-        return { id:makeID(), name:a.name, cat:a.cat, type:a.type||'Cash', cur:a.cur, val:a.val };
+        return { id:makeID(), name:a.name, cat:a.cat, type:a.type||'Cash', cur:a.cur, val:0 };
       });
       saveState();
     }
@@ -1558,7 +1558,19 @@ function renderNetWorth() {
       input.dataset.month = m;
       input.dataset.accid = String(acc.id);
       input.style.cssText='font-size:.85rem;padding:5px 8px;border:1px solid var(--paper-3);border-radius:4px;background:var(--paper);width:100%';
-      input.onchange=function(){ updateNWValue(this.dataset.month, this.dataset.accid, this.value); };;
+      input.addEventListener('blur', function() {
+        var savedMonth = this.dataset.month;
+        var savedId = this.dataset.accid;
+        var newVal = parseFloat(this.value) || 0;
+        var md = getNWM(savedMonth);
+        var acc = md.accounts.find(function(a){ return String(a.id) === savedId; });
+        if (acc && acc.val !== newVal) {
+          acc.val = newVal;
+          saveState();
+          // Only re-render if we're still on the same month
+          if (nwMonth === savedMonth) renderNetWorth();
+        }
+      });;
       var sgdSpan = document.createElement('span');
       sgdSpan.className='mono '+(isBiz?'text-red':'col-sgd');
       sgdSpan.style.fontSize='.82rem'; sgdSpan.textContent=fmtSGD(sgd);
@@ -1964,8 +1976,76 @@ function renderDashboard() {
   renderNWChart('nwChart');
 }
 
-// INIT
-loadState();
+// MONTH PICKER
+var monthPickerTarget = 'budget';
+
+function openMonthPicker(target) {
+  monthPickerTarget = target;
+  var overlay = document.getElementById('month-picker-overlay');
+  overlay.style.display = 'flex';
+
+  // Populate years 2019 - current+1
+  var yearSel = document.getElementById('mp-year');
+  yearSel.innerHTML = '';
+  var currentYear = new Date().getFullYear();
+  for (var y = currentYear + 1; y >= 2019; y--) {
+    var opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    yearSel.appendChild(opt);
+  }
+
+  // Set current values
+  var current = target === 'nw' ? nwMonth : state.currentBudgetMonth;
+  var parts = current.split('-');
+  document.getElementById('mp-month').value = parts[1];
+  yearSel.value = parts[0];
+}
+
+function closeMonthPicker() {
+  document.getElementById('month-picker-overlay').style.display = 'none';
+}
+
+function confirmMonthPicker() {
+  var m = document.getElementById('mp-month').value;
+  var y = document.getElementById('mp-year').value;
+  var target = y + '-' + m;
+  closeMonthPicker();
+  if (monthPickerTarget === 'nw') {
+    nwMonth = target;
+    var prev = prevMonth(nwMonth);
+    if (state.nwMonths && state.nwMonths[prev] && state.nwMonths[prev].accounts.length) {
+      var cur = getNWM(nwMonth);
+      if (!cur.accounts.length) {
+        cur.accounts = state.nwMonths[prev].accounts.map(function(a) {
+          return { id:makeID(), name:a.name, cat:a.cat, type:a.type||'Cash', cur:a.cur, val:0 };
+        });
+        saveState();
+      }
+    }
+    renderNetWorth();
+  } else {
+    state.currentBudgetMonth = target;
+    var prevM = prevMonth(target);
+    if ((!state.budgetMonths[target] || !state.budgetMonths[target].items.length) &&
+        state.budgetMonths[prevM] && state.budgetMonths[prevM].items.length) {
+      state.budgetMonths[target] = {
+        items: state.budgetMonths[prevM].items.map(function(i){
+          return {id:Date.now()+Math.random(),name:i.name,cat:i.cat,cur:i.cur,amt:i.amt};
+        }),
+        actual: null, fx: null
+      };
+    }
+    saveState();
+    renderBudget(); renderSummary(); renderSpendingChart();
+  }
+}
+
+// Close picker on overlay click
+document.getElementById('month-picker-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeMonthPicker();
+});
+
+
 if (!state.dividends) state.dividends = [];
 if (!state.nwMonths) state.nwMonths = {};
 // Always default to current month/year on load
@@ -1980,5 +2060,28 @@ document.getElementById('headerDate').textContent = new Date().toLocaleDateStrin
 renderAll();
 loadFX(); // attempt live rates — will silently fail and use manual rates if unavailable
 </script>
-</body>
-</html>
+<!-- Month Picker Modal -->
+<div id="month-picker-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--paper);border-radius:var(--radius);padding:1.5rem;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.15)">
+    <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:1rem">Jump to Month</div>
+    <div style="display:flex;gap:.75rem;margin-bottom:1rem">
+      <div class="form-group" style="flex:1"><label>Month</label>
+        <select id="mp-month">
+          <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+          <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+          <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+          <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+        </select>
+      </div>
+      <div class="form-group" style="flex:1"><label>Year</label>
+        <select id="mp-year"></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem;justify-content:flex-end">
+      <button class="btn-ghost" onclick="closeMonthPicker()">Cancel</button>
+      <button class="btn" onclick="confirmMonthPicker()">Go</button>
+    </div>
+  </div>
+</div>
+
+
