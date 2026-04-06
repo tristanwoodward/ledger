@@ -1469,7 +1469,11 @@ function renderNetWorth() {
       document.getElementById('nw-inv-total').textContent = '—';
       document.getElementById('nw-inv-pct').textContent = '';
     } else {
+      // No lump data — make sure form is fully visible
       if (lumpEl) lumpEl.style.display = 'none';
+      if (lumpInput) lumpInput.style.display = '';
+      if (document.getElementById('nw-lump-cur')) document.getElementById('nw-lump-cur').style.display = '';
+      if (document.querySelector('#nw-lump-section .btn')) document.querySelector('#nw-lump-section .btn').style.display = '';
       var lumpCurEl = document.getElementById('nw-lump-cur');
       if (lumpCurEl && m < '2024-01') lumpCurEl.value = 'AUD';
       document.getElementById('nw-total').textContent = '—';
