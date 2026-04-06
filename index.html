@@ -1372,7 +1372,7 @@ function changeNWMonth(dir) {
     var cur = getNWM(nwMonth);
     if (!cur.accounts.length) {
       cur.accounts = state.nwMonths[prev].accounts.map(function(a) {
-        return { id:Date.now()+Math.random(), name:a.name, cat:a.cat, type:a.type||'Cash', cur:a.cur, val:a.val };
+        return { id:makeID(), name:a.name, cat:a.cat, type:a.type||'Cash', cur:a.cur, val:a.val };
       });
       saveState();
     }
@@ -1388,9 +1388,9 @@ function addNWAccount() {
   if (!name) return;
   if (!state.nwMonths) state.nwMonths = {};
   var newAcc = { name:name, cat:cat, type:type, cur:cur, val:0 };
-  getNWM(nwMonth).accounts.push(Object.assign({id:Date.now()}, newAcc));
+  getNWM(nwMonth).accounts.push(Object.assign({id:makeID()}, newAcc));
   Object.keys(state.nwMonths).forEach(function(m) {
-    if (m !== nwMonth) state.nwMonths[m].accounts.push(Object.assign({id:Date.now()+Math.random()}, newAcc));
+    if (m !== nwMonth) state.nwMonths[m].accounts.push(Object.assign({id:makeID()}, newAcc));
   });
   document.getElementById('nw-acc-name').value = '';
   document.getElementById('nw-add-form').style.display = 'none';
@@ -1406,11 +1406,14 @@ function removeNWAccount(name) {
   saveState(); renderNetWorth();
 }
 
+function makeID() { return Date.now() + '_' + Math.random().toString(36).slice(2,9); }
+
 function updateNWValue(m, id, val) {
   var md = getNWM(m);
-  var acc = md.accounts.find(function(a){ return a.id === id; });
+  var acc = md.accounts.find(function(a){ return String(a.id) === String(id); });
   if (acc) { acc.val = parseFloat(val) || 0; saveState(); renderNetWorth(); }
 }
+
 
 function saveNWFX() {
   var md = getNWM(nwMonth);
