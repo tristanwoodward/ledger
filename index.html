@@ -1555,8 +1555,10 @@ function renderNetWorth() {
       curSpan.textContent = acc.cur;
       var input = document.createElement('input');
       input.type='number'; input.value=acc.val;
+      input.dataset.month = m;
+      input.dataset.accid = String(acc.id);
       input.style.cssText='font-size:.85rem;padding:5px 8px;border:1px solid var(--paper-3);border-radius:4px;background:var(--paper);width:100%';
-      (function(mm,aid){ input.onchange=function(){ updateNWValue(mm,aid,this.value); }; })(m,acc.id);
+      input.onchange=function(){ updateNWValue(this.dataset.month, this.dataset.accid, this.value); };;
       var sgdSpan = document.createElement('span');
       sgdSpan.className='mono '+(isBiz?'text-red':'col-sgd');
       sgdSpan.style.fontSize='.82rem'; sgdSpan.textContent=fmtSGD(sgd);
