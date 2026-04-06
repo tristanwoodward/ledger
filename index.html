@@ -109,6 +109,7 @@ tr:hover td { background: var(--paper); }
 /* BUDGET ITEM GRID: name | cat | original | S$ | A$ | THB | del */
 .bud-col-header { display: grid; grid-template-columns: 2.5fr 1.2fr 0.9fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 0 0 8px 0; border-bottom: 2px solid var(--paper-3); margin-bottom: 2px; }
 .bud-col-header span { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+  .bud-col-header span:nth-child(3) { text-align: right; }
 .bud-item-row { display: grid; grid-template-columns: 2.5fr 1.2fr 0.9fr 1fr 1fr 1fr 36px; gap: 0.75rem; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--paper-2); }
 .bud-item-row:last-child { border-bottom: none; }
 .bud-total-row { display: grid; grid-template-columns: 2.5fr 1.2fr 0.9fr 1fr 1fr 1fr 36px; gap: 0.75rem; padding: 12px 0 0 0; border-top: 2px solid var(--ink); margin-top: 8px; }
@@ -405,7 +406,7 @@ tr:hover td { background: var(--paper); }
 
     <div class="card-title">Budget Items</div>
     <div class="bud-col-header">
-      <span>Item</span><span>Category</span><span>Original</span>
+      <span>Item</span><span>Category</span><span style="text-align:right">Original</span>
       <span style="color:var(--green);cursor:pointer;user-select:none" onclick="sortBudgetItems('sgd')" id="sort-sgd">S$ Equiv. ↕</span>
       <span style="color:#b8860b;cursor:pointer;user-select:none" onclick="sortBudgetItems('aud')" id="sort-aud">A$ Equiv. ↕</span>
       <span style="color:var(--blue);cursor:pointer;user-select:none" onclick="sortBudgetItems('thb')" id="sort-thb">THB Equiv. ↕</span>
