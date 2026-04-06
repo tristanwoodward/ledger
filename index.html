@@ -420,11 +420,15 @@ tr:hover td { background: var(--paper); }
       </thead>
       <tbody id="budget-items-list"></tbody>
       <tfoot id="bud-total-row" style="display:none">
-      <span style="font-weight:700">Total</span><span></span><span></span>
-      <span class="mono col-sgd" id="bud-items-sgd">S$0</span>
-      <span class="mono col-aud" id="bud-items-aud">A$0</span>
-      <span class="mono col-thb" id="bud-items-thb">฿0</span>
-      <span></span>
+        <tr style="border-top:2px solid var(--ink)">
+          <td colspan="3" style="padding:12px 12px 4px 0;font-weight:700;font-size:.875rem">Total</td>
+          <td style="padding:12px 12px 4px 0;text-align:right" class="mono col-sgd" id="bud-total-sgd"></td>
+          <td style="padding:12px 12px 4px 0;text-align:right" class="mono col-aud" id="bud-total-aud"></td>
+          <td style="padding:12px 0 4px 0;text-align:right" class="mono col-thb" id="bud-total-thb"></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
     </div>
 
     <!-- FX Override -->
@@ -919,9 +923,9 @@ function renderBudget() {
 
   document.getElementById('budget-month-label').textContent = mLabel(m);
   document.getElementById('bud-total').textContent = fmtSGD(totalSGD);
-  document.getElementById('bud-items-sgd').textContent = fmtSGD(totalSGD);
-  document.getElementById('bud-items-aud').textContent = 'A$' + Math.round(totalAUD).toLocaleString('en-US');
-  document.getElementById('bud-items-thb').textContent = '฿' + Math.round(totalTHB).toLocaleString('en-US');
+  document.getElementById('bud-total-sgd').textContent = fmtSGD(totalSGD);
+  document.getElementById('bud-total-aud').textContent = 'A$' + Math.round(totalAUD).toLocaleString('en-US');
+  document.getElementById('bud-total-thb').textContent = '฿' + Math.round(totalTHB).toLocaleString('en-US');
   document.getElementById('bud-total-row').style.display = md.items.length ? 'table-footer-group' : 'none';
 
   // Actual
