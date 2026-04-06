@@ -2041,9 +2041,11 @@ function confirmMonthPicker() {
 }
 
 // Close picker on overlay click
-document.getElementById('month-picker-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeMonthPicker();
-});
+function initMonthPicker() {
+  document.getElementById('month-picker-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeMonthPicker();
+  });
+}
 
 
 if (!state.dividends) state.dividends = [];
@@ -2058,6 +2060,7 @@ document.getElementById('tx-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('inc-date').value = new Date().toISOString().slice(0,10);
 document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
 renderAll();
+initMonthPicker();
 loadFX(); // attempt live rates — will silently fail and use manual rates if unavailable
 </script>
 <!-- Month Picker Modal -->
