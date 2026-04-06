@@ -409,12 +409,12 @@ tr:hover td { background: var(--paper); }
     <table id="budget-table" style="width:100%;border-collapse:collapse">
       <thead>
         <tr style="border-bottom:2px solid var(--paper-3)">
-          <th style="text-align:left;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">Item</th>
-          <th style="text-align:left;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">Category</th>
-          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">Original</th>
-          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--green);cursor:pointer" onclick="sortBudgetItems('sgd')" id="sort-sgd">S$ ↕</th>
-          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#b8860b;cursor:pointer" onclick="sortBudgetItems('aud')" id="sort-aud">A$ ↕</th>
-          <th style="text-align:right;padding:0 0 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);cursor:pointer" onclick="sortBudgetItems('thb')" id="sort-thb">THB ↕</th>
+          <th style="text-align:left;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);width:25%">Item</th>
+          <th style="text-align:left;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);width:15%">Category</th>
+          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);width:15%">Original</th>
+          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--green);cursor:pointer;width:13%" onclick="sortBudgetItems('sgd')" id="sort-sgd">S$ Equiv. ↕</th>
+          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#b8860b;cursor:pointer;width:13%" onclick="sortBudgetItems('aud')" id="sort-aud">A$ Equiv. ↕</th>
+          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);cursor:pointer;width:13%" onclick="sortBudgetItems('thb')" id="sort-thb">THB Equiv. ↕</th>
           <th style="width:36px"></th>
         </tr>
       </thead>
@@ -1006,7 +1006,7 @@ function renderBudget() {
       amtWrap.dataset.id = idStr;
       amtWrap.dataset.field = 'amt';
       amtWrap.dataset.month = m;
-      amtWrap.style.cssText = 'font-family:"DM Mono",monospace;font-size:.85rem;color:var(--ink-3);border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;border-radius:3px';
+      amtWrap.style.cssText = 'font-family:"DM Mono",monospace;font-size:.85rem;color:var(--ink-3);border:1px solid transparent;background:transparent;padding:2px 4px;width:100%;text-align:right;border-radius:3px;display:block';
       amtWrap.onfocus = function(){
         this.style.borderColor='var(--gold)'; this.style.background='#fff';
         this.value = String(item.amt);
