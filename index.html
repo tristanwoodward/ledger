@@ -405,15 +405,21 @@ tr:hover td { background: var(--paper); }
     </div>
 
     <div class="card-title">Budget Items</div>
-    <div class="bud-col-header">
-      <span>Item</span><span>Category</span><span style="text-align:right">Original</span>
-      <span style="color:var(--green);cursor:pointer;user-select:none;text-align:right" onclick="sortBudgetItems('sgd')" id="sort-sgd">S$ ↕</span>
-      <span style="color:#b8860b;cursor:pointer;user-select:none;text-align:right" onclick="sortBudgetItems('aud')" id="sort-aud">A$ ↕</span>
-      <span style="color:var(--blue);cursor:pointer;user-select:none;text-align:right" onclick="sortBudgetItems('thb')" id="sort-thb">THB ↕</span>
-      <span></span>
-    </div>
-    <div id="budget-items-list"></div>
-    <div class="bud-total-row" id="bud-total-row" style="display:none">
+    <div style="overflow-x:auto">
+    <table id="budget-table" style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="border-bottom:2px solid var(--paper-3)">
+          <th style="text-align:left;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">Item</th>
+          <th style="text-align:left;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">Category</th>
+          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">Original</th>
+          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--green);cursor:pointer" onclick="sortBudgetItems('sgd')" id="sort-sgd">S$ ↕</th>
+          <th style="text-align:right;padding:0 12px 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#b8860b;cursor:pointer" onclick="sortBudgetItems('aud')" id="sort-aud">A$ ↕</th>
+          <th style="text-align:right;padding:0 0 8px 0;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);cursor:pointer" onclick="sortBudgetItems('thb')" id="sort-thb">THB ↕</th>
+          <th style="width:36px"></th>
+        </tr>
+      </thead>
+      <tbody id="budget-items-list"></tbody>
+      <tfoot id="bud-total-row" style="display:none">
       <span style="font-weight:700">Total</span><span></span><span></span>
       <span class="mono col-sgd" id="bud-items-sgd">S$0</span>
       <span class="mono col-aud" id="bud-items-aud">A$0</span>
@@ -916,7 +922,7 @@ function renderBudget() {
   document.getElementById('bud-items-sgd').textContent = fmtSGD(totalSGD);
   document.getElementById('bud-items-aud').textContent = 'A$' + Math.round(totalAUD).toLocaleString('en-US');
   document.getElementById('bud-items-thb').textContent = '฿' + Math.round(totalTHB).toLocaleString('en-US');
-  document.getElementById('bud-total-row').style.display = md.items.length ? 'grid' : 'none';
+  document.getElementById('bud-total-row').style.display = md.items.length ? 'table-footer-group' : 'none';
 
   // Actual
   if (md.actual) {
@@ -957,7 +963,7 @@ function renderBudget() {
   var list = document.getElementById('budget-items-list');
   list.innerHTML = '';
   if (!md.items.length) {
-    list.innerHTML = '<div class="empty" style="padding:1.5rem"><div class="empty-icon">📋</div>No items yet. Add your first budget item above.</div>';
+    list.innerHTML = '<tr><td colspan="7" style="padding:1.5rem;text-align:center;color:var(--ink-3)">No items yet. Add your first budget item above.</td></tr>';
   } else {
     itemsToRender.forEach(function(item) {
       var sgd = cvt(item.amt, item.cur);
@@ -965,8 +971,8 @@ function renderBudget() {
       var thb = sgd * (mfx.THB || 1);
       var idStr = String(item.id);
 
-      var row = document.createElement('div');
-      row.className = 'bud-item-row';
+      var row = document.createElement('tr');
+      row.style.borderBottom = '1px solid var(--paper-2)';
 
       // Name (editable)
       var nameInput = document.createElement('input');
@@ -1027,9 +1033,15 @@ function renderBudget() {
       delBtn.dataset.id = idStr;
       delBtn.onclick = function(){ removeBudgetItem(parseFloat(this.dataset.id)); };
 
-      row.appendChild(nameInput); row.appendChild(catInput); row.appendChild(amtWrap);
-      row.appendChild(sgdSpan); row.appendChild(audSpan); row.appendChild(thbSpan);
-      row.appendChild(delBtn);
+      var tdName = document.createElement('td'); tdName.style.padding='8px 12px 8px 0'; tdName.appendChild(nameInput);
+      var tdCat  = document.createElement('td'); tdCat.style.padding='8px 12px 8px 0'; tdCat.appendChild(catInput);
+      var tdAmt  = document.createElement('td'); tdAmt.style.cssText='padding:8px 12px 8px 0;text-align:right'; tdAmt.appendChild(amtWrap);
+      var tdSgd  = document.createElement('td'); tdSgd.style.cssText='padding:8px 12px 8px 0;text-align:right'; tdSgd.appendChild(sgdSpan);
+      var tdAud  = document.createElement('td'); tdAud.style.cssText='padding:8px 12px 8px 0;text-align:right'; tdAud.appendChild(audSpan);
+      var tdThb  = document.createElement('td'); tdThb.style.cssText='padding:8px 0 8px 0;text-align:right'; tdThb.appendChild(thbSpan);
+      var tdDel  = document.createElement('td'); tdDel.style.cssText='padding:8px 0;text-align:right;width:36px'; tdDel.appendChild(delBtn);
+      row.appendChild(tdName); row.appendChild(tdCat); row.appendChild(tdAmt);
+      row.appendChild(tdSgd); row.appendChild(tdAud); row.appendChild(tdThb); row.appendChild(tdDel);
       list.appendChild(row);
     });
   }
